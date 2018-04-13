@@ -1,0 +1,869 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="引言基于官方Jenkins镜像，构建打包环境，包括Maven/git/nodejs;预安装jenkins各种插件；具体见：   https://github.com/smalldok/jenkins-maven-git-nodejs-docker 以下是构建jenkins image步骤 拉取官方镜像 启动docker服务  拉取jenkins镜像(docker hub 官方)官方镜像搜索：htt">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker构建Jenkins image">
+<meta property="og:url" content="https://smalldok.github.io/2018/04/13/docker构建jenkins image/index.html">
+<meta property="og:site_name" content="Smalldok&#39;s Tech Blog">
+<meta property="og:description" content="引言基于官方Jenkins镜像，构建打包环境，包括Maven/git/nodejs;预安装jenkins各种插件；具体见：   https://github.com/smalldok/jenkins-maven-git-nodejs-docker 以下是构建jenkins image步骤 拉取官方镜像 启动docker服务  拉取jenkins镜像(docker hub 官方)官方镜像搜索：htt">
+<meta property="og:updated_time" content="2018-04-13T01:59:58.100Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker构建Jenkins image">
+<meta name="twitter:description" content="引言基于官方Jenkins镜像，构建打包环境，包括Maven/git/nodejs;预安装jenkins各种插件；具体见：   https://github.com/smalldok/jenkins-maven-git-nodejs-docker 以下是构建jenkins image步骤 拉取官方镜像 启动docker服务  拉取jenkins镜像(docker hub 官方)官方镜像搜索：htt">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://smalldok.github.io/2018/04/13/docker构建jenkins image/"/>
+
+
+
+
+
+  <title>Docker构建Jenkins image | Smalldok's Tech Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6cc27890b716ee2ca5deb7aa76a254f3";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Smalldok's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">互联网基础设施</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2018/04/13/docker构建jenkins image/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker构建Jenkins image</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T10:12:00+08:00">
+                2018-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/容器/" itemprop="url" rel="index">
+                    <span itemprop="name">容器</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>基于官方Jenkins镜像，构建打包环境，包括Maven/git/nodejs;<br>预安装jenkins各种插件；<br>具体见：   <a href="https://github.com/smalldok/jenkins-maven-git-nodejs-docker" target="_blank" rel="external">https://github.com/smalldok/jenkins-maven-git-nodejs-docker</a></p>
+<p>以下是构建jenkins image步骤</p>
+<h1 id="拉取官方镜像"><a href="#拉取官方镜像" class="headerlink" title="拉取官方镜像"></a>拉取官方镜像</h1><ul>
+<li><p>启动docker服务</p>
+</li>
+<li><p>拉取jenkins镜像(docker hub 官方)<br>官方镜像搜索：<a href="https://hub.docker.com" target="_blank" rel="external">https://hub.docker.com</a><br><code>docker pull jenkins:2.60.3</code> 或者<code>docker pull jenkins</code></p>
+</li>
+<li>查看镜像<br><code>docker images</code></li>
+<li>删除镜像<br><code>docker rmi 7b210b6c238a</code> 或者 <code>docker rmi -f 7b210b6c238a</code></li>
+<li>运行镜像  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --name myjenkins -p 8080:8080 -p 50000:50000 -v /Users/smalldok/work/idea-work/docker/volume/jenkins_home:/var/jenkins_home jenkins:2.60.3</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>或者以交互方式运行(这种适合更新修改镜像内部的东西)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">docker run --name myjenkins -i -t -p 8080:8080 -p 50000:50000 -v /Users/smalldok/work/idea-work/docker/volume/jenkins_home:/var/jenkins_home jenkins:2.60.3 /bin/bash</div><div class="line"></div><div class="line">然后exit退出、commit来重新创建镜像副本</div></pre></td></tr></table></figure></p>
+<p>或者后台方式运行(推荐)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --name myjenkins -d --env JAVA_OPTS=&quot;-Xmx8192m&quot; -p 8080:8080 -p 50000:50000 -v /Users/smalldok/work/idea-work/docker/volume/jenkins_home:/var/jenkins_home jenkins:2.60.3</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --name myjenkins -d --env JAVA_OPTS=&quot;-Xmx8192m&quot; -p 8080:8080 -p 50000:50000 -v /Users/smalldok/work/idea-work/docker/volume/jenkins_home:/var/jenkins_home -e ROOT_PASS=&quot;jenkins&quot; jenkins:2.60.3</div></pre></td></tr></table></figure>
+<ul>
+<li>jenkins解锁<br>启动后访问<a href="http://127.0.0.1:8080/" target="_blank" rel="external">http://127.0.0.1:8080/</a> 出现Unlock Jenkins页面，按提示在jenkins容器中获取密码；<br>命令行进入容器:<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">docker ps -l</div><div class="line">docker exec -it 91e4b117c7f0 /bin/bash</div><div class="line">cat /var/jenkins_home/secrets/initialAdminPassword</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>以root用户进入容器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker exec -it -u root myjenkins /bin/bash</div></pre></td></tr></table></figure></p>
+<h1 id="制作Dockerfile"><a href="#制作Dockerfile" class="headerlink" title="制作Dockerfile"></a>制作Dockerfile</h1><h3 id="验证jenkins-plugin安装"><a href="#验证jenkins-plugin安装" class="headerlink" title="验证jenkins plugin安装"></a>验证jenkins plugin安装</h3><h5 id="jenkins-plugin-list"><a href="#jenkins-plugin-list" class="headerlink" title="jenkins plugin list"></a>jenkins plugin list</h5><ul>
+<li>Organization and Administration<br>dashboard-view<br>cloudbees-folder<br>antisamy-markup-formatter<br>backup</li>
+<li>Build Features<br>token-macro<br>build-timeout<br>credentials-binding<br>ws-cleanup<br>timestamper</li>
+<li>Build Tools<br>nodejs<br>build-name-setter<br>scm-api 源码管理工具</li>
+<li>Build Analysis and Reporting<br>无</li>
+<li>Pipelines and Continuous Delivery<br>build-pipeline-plugin<br>parameterized-trigger<br>copyartifact</li>
+<li>Source Code Management<br>git-client<br>git<br>gitlab-plugin<br>github-pullrequest  </li>
+<li>User Management and Security<br>matrix-auth<br>pam-auth<br>ldap<br>role-strategy  </li>
+<li>Notifications and Publishing<br>Publish Over SSH<br>ssh-credentials<br>SSH<br>Mailer<br>email-ext</li>
+<li>project and view<br>nested-view<br>sectioned-view  </li>
+<li>docker<br>docker-commons<br>docker-build-publish<br>docker-plugin<br>kubernetes</li>
+</ul>
+<h5 id="jenkins-plugin-txt"><a href="#jenkins-plugin-txt" class="headerlink" title="jenkins plugin.txt"></a>jenkins plugin.txt</h5><p>查找或下载插件 <a href="https://plugins.jenkins.io/" target="_blank" rel="external">https://plugins.jenkins.io/</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">dashboard-view:latest</div><div class="line">cloudbees-folder:latest</div><div class="line">antisamy-markup-formatter:latest</div><div class="line">backup:latest</div><div class="line"></div><div class="line">token-macro:latest</div><div class="line">build-timeout:latest</div><div class="line">credentials-binding:latest</div><div class="line">ws-cleanup:latest</div><div class="line">timestamper:latest</div><div class="line"></div><div class="line">nodejs:latest</div><div class="line">build-name-setter:latest</div><div class="line">scm-api:latest</div><div class="line"></div><div class="line">build-pipeline-plugin:latest</div><div class="line">parameterized-trigger:latest</div><div class="line">copyartifact:latest</div><div class="line"></div><div class="line">git-client:latest</div><div class="line">git:latest</div><div class="line">gitlab-plugin:latest</div><div class="line">github-pullrequest:latest</div><div class="line"></div><div class="line">matrix-auth:latest</div><div class="line">pam-auth:latest</div><div class="line">ldap:latest</div><div class="line">role-strategy:latest</div><div class="line"></div><div class="line">publish-over-ssh:latest</div><div class="line">ssh-credentials:latest</div><div class="line">ssh:latest</div><div class="line">mailer:latest</div><div class="line">email-ext:latest</div><div class="line"></div><div class="line">nested-view:latest</div><div class="line">sectioned-view:latest</div><div class="line"></div><div class="line">docker-commons:latest</div><div class="line">docker-build-publish:latest</div><div class="line">docker-plugin:latest</div><div class="line">kubernetes:latest</div></pre></td></tr></table></figure></p>
+<p>验证插件安装  </p>
+<ul>
+<li><p>进入容器命令行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker exec -it -u root myjenkins /bin/bash</div></pre></td></tr></table></figure>
+</li>
+<li><p>准备plugins.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd /usr/share/jenkins/</div><div class="line">vi plugins.txt</div></pre></td></tr></table></figure>
+</li>
+<li><p>执行插件安装脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/local/bin/install-plugins.sh $(cat /usr/share/jenkins/plugins.txt | tr &apos;\n&apos; &apos; &apos;)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>单个失败，则重新安装,如：<br><code>/usr/local/bin/install-plugins.sh jira-trigger:latest</code><br>安装完成后，查看<code>/usr/share/jenkins/ref/plugins</code>目录；</p>
+<ul>
+<li>登录jenkins 控制台页面查看<br><a href="http://127.0.0.1:8080/pluginManager/installed" target="_blank" rel="external">http://127.0.0.1:8080/pluginManager/installed</a><h3 id="验证JDK、GIT、SSH安装"><a href="#验证JDK、GIT、SSH安装" class="headerlink" title="验证JDK、GIT、SSH安装"></a>验证JDK、GIT、SSH安装</h3>JDK，默认在jenkins基础镜像中已经安装，见官方Dockerfile: <code>https://github.com/jenkinsci/docker/blob/master/Dockerfile</code><br>GIT，默认在上面安装jenkins插件git时已经安装;<br>SSH，默认在上面安装jenkins插件ssh时已经安装;<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">java -version</div><div class="line">git --version</div><div class="line">ssh</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="验证maven安装"><a href="#验证maven安装" class="headerlink" title="验证maven安装"></a>验证maven安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">apt-get update &amp;&amp; apt-get install -y wget</div><div class="line"># get maven 3.5.3</div><div class="line">wget --no-verbose -O /tmp/apache-maven-3.5.3.tar.gz http://archive.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz</div><div class="line"></div><div class="line"># verify checksum</div><div class="line">echo &quot;51025855d5a7456fc1a67666fbef29de /tmp/apache-maven-3.5.3.tar.gz&quot; | md5sum -c</div><div class="line"></div><div class="line"># install maven</div><div class="line">tar xzf /tmp/apache-maven-3.5.3.tar.gz -C /opt/</div><div class="line">ln -s /opt/apache-maven-3.5.3 /opt/maven</div><div class="line">ln -s /opt/maven/bin/mvn /usr/local/bin</div><div class="line">rm -f /tmp/apache-maven-3.5.3.tar.gz</div><div class="line"></div><div class="line"># env</div><div class="line">vi ~/.bashrc</div><div class="line"></div><div class="line">MAVEN_HOME=&quot;/opt/maven&quot;</div><div class="line">PATH=&quot;$PATH:$MAVEN_HOME&quot;</div><div class="line">export MAVEN_HOME</div><div class="line">export PATH</div><div class="line"></div><div class="line">保存wq! 然后生效source ~/.bashrc</div><div class="line"></div><div class="line">#check MAVEN</div><div class="line">mvn -v</div><div class="line">echo $MAVEN_HOME</div></pre></td></tr></table></figure>
+<h3 id="验证nodejs安装"><a href="#验证nodejs安装" class="headerlink" title="验证nodejs安装"></a>验证nodejs安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"># get nodejs 9.9.0</div><div class="line">wget --no-verbose -O /tmp/node-v9.9.0-linux-x64.tar.gz https://nodejs.org/dist/v9.9.0/node-v9.9.0-linux-x64.tar.gz</div><div class="line"></div><div class="line"># install nodejs</div><div class="line">tar xzf /tmp/node-v9.9.0-linux-x64.tar.gz -C /opt/</div><div class="line">ln -s /opt/node-v9.9.0-linux-x64 /opt/nodejs</div><div class="line">ln -s /opt/nodejs/bin/node /usr/local/bin/node</div><div class="line">ln -s /opt/nodejs/bin/npm /usr/local/bin/npm</div><div class="line">rm -f /tmp/node-v9.9.0-linux-x64.tar.gz</div><div class="line"></div><div class="line">#check nodejs</div><div class="line">node -v</div><div class="line">npm -v</div></pre></td></tr></table></figure>
+<h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"># 基础镜像,基于官方jenkins2.60.3,包括openJDK8</div><div class="line"># 见 https://github.com/jenkinsci/docker/blob/master/Dockerfile</div><div class="line">#</div><div class="line"># 预安装jenkins各种插件maven/git/nodejs/docker plugin等等,详见: resources/plugins.txt</div><div class="line"># 预安装maven、git、nodejs、SSH环境</div><div class="line">#</div><div class="line"># github: https://github.com/smalldok/jenkins+maven-git-nodejs-docker</div><div class="line"></div><div class="line">FROM jenkins:2.60.3</div><div class="line">MAINTAINER smalldok yaojialing5566@gmail.com</div><div class="line"></div><div class="line"># Install Jenkins Plugins</div><div class="line">COPY resources/plugins.txt /usr/share/jenkins/plugins.txt</div><div class="line">RUN /usr/local/bin/install-plugins.sh $(cat /usr/share/jenkins/plugins.txt | tr &apos;\n&apos; &apos; &apos;)</div><div class="line"></div><div class="line"># Install maven</div><div class="line">USER root</div><div class="line">RUN apt-get update &amp;&amp; apt-get install -y wget</div><div class="line"></div><div class="line"># get maven 3.5.3</div><div class="line">RUN wget --no-verbose -O /tmp/apache-maven-3.5.3.tar.gz http://archive.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz</div><div class="line"></div><div class="line"># verify checksum</div><div class="line">RUN echo &quot;51025855d5a7456fc1a67666fbef29de /tmp/apache-maven-3.5.3.tar.gz&quot; | md5sum -c</div><div class="line"></div><div class="line"># install maven</div><div class="line">RUN tar xzf /tmp/apache-maven-3.5.3.tar.gz -C /opt/ \</div><div class="line">	&amp;&amp; ln -s /opt/apache-maven-3.5.3 /opt/maven \</div><div class="line">	&amp;&amp; ln -s /opt/maven/bin/mvn /usr/local/bin \</div><div class="line">	&amp;&amp; rm -f /tmp/apache-maven-3.5.3.tar.gz</div><div class="line"></div><div class="line">ENV MAVEN_HOME /opt/maven</div><div class="line"></div><div class="line"># Switch back to Jenkins user</div><div class="line">USER jenkins</div></pre></td></tr></table></figure>
+<h3 id="Build-image"><a href="#Build-image" class="headerlink" title="Build image"></a>Build image</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"># build</div><div class="line">docker build -t smalldok/jenkins:1.0 .</div><div class="line"></div><div class="line"># check image</div><div class="line">docker images</div><div class="line"></div><div class="line"># run</div><div class="line">docker run --name myjenkins -d --env JAVA_OPTS=&quot;-Xmx8192m&quot; -p 8080:8080 -p 50000:50000 -v /Users/smalldok/work/idea-work/docker/volume/jenkins_home:/var/jenkins_home -e ROOT_PASS=&quot;jenkins&quot; smalldok/jenkins:1.0</div><div class="line"></div><div class="line"># open console</div><div class="line">http://127.0.0.1:8080/</div><div class="line"></div><div class="line"># stop container</div><div class="line">docker stop myjenkins</div><div class="line"></div><div class="line"># delete container</div><div class="line">docker rm myjenkins</div></pre></td></tr></table></figure>
+<h3 id="Push-image"><a href="#Push-image" class="headerlink" title="Push image"></a>Push image</h3><ul>
+<li>注册Hub账号： <a href="https://hub.docker.com/" target="_blank" rel="external">https://hub.docker.com/</a></li>
+<li>在账户中创建仓库：Create Repository</li>
+<li><p>login hub</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker login</div></pre></td></tr></table></figure>
+</li>
+<li><p>upload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker push smalldok/jenkins:1.0</div></pre></td></tr></table></figure>
+</li>
+<li><p>其他命令  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 修改镜像tag</div><div class="line">docker tag &lt;imageID&gt; &lt;namespace&gt;/&lt;image name&gt;:&lt;version tag eg latest&gt;；</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h3 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h3><p>删除容器，会删除<code>-v /your/home:/var/jenkins_home</code>指定挂载目录下的数据？<br>不会，例如：执行<code>docker rm myjenkins</code>,并不会删除宿主机/your/home下的数据</p>
+<h3 id="问题2"><a href="#问题2" class="headerlink" title="问题2"></a>问题2</h3><p>构建Image Size过大问题？<br>一条指令构建一层layer，应该减少层即可减少体积;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">RUN aaaaa</div><div class="line">RUN bbbbb</div><div class="line">RUN ccccc</div></pre></td></tr></table></figure></p>
+<p>应尽量改为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">RUN aaaaa \</div><div class="line">    &amp;&amp; bbbbb \</div><div class="line">    &amp;&amp; ccccc</div></pre></td></tr></table></figure></p>
+<h3 id="问题3"><a href="#问题3" class="headerlink" title="问题3"></a>问题3</h3><p>docker: Error response from daemon: error creating overlay mount to /Users/smalldok/install/docker/docker-root-dir/overlay2/517ba0e3473b5196356d2c970322371964dff4c8803acc88421e71a34aabe783-init/merged: invalid argument.<br>不要修改docker root dir，还原为默认的/var/lib/docker下</p>
+<h3 id="问题4："><a href="#问题4：" class="headerlink" title="问题4："></a>问题4：</h3><p>ocker: Error response from daemon: Conflict. The container name “/myjenkins” is already in use by container “e4c7f088c941063dfbea65c65ec683978dab2d309fa252a9f735594f6bb481d9”. You have to remove (or rename) that container to be able to reuse that name.<br>主机上运行docker rm xxxx 删除容器</p>
+<h3 id="问题5："><a href="#问题5：" class="headerlink" title="问题5："></a>问题5：</h3><p>在容器中执行vi xxx.txt 报错 vi: command not found；<br>在使用docker容器时，有时候里边没有安装vim，敲vim命令时提示说：vim: command not found，这个时候就需要安装vim，可是当你敲apt-get install vim命令时，提示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Reading package lists... Done</div><div class="line">Building dependency tree       </div><div class="line">Reading state information... Done</div><div class="line">E: Unable to locate package vim</div></pre></td></tr></table></figure></p>
+<p>这时候需要敲：apt-get update，这个命令的作用是：同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引，这样才能获取到最新的软件包。<br>等更新完毕以后再敲命令：apt-get install vim命令即可。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/30/spring-retry 破坑/" rel="next" title="spring-retry 破坑">
+                <i class="fa fa-chevron-left"></i> spring-retry 破坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar1.jpg"
+               alt="smalldok" />
+          <p class="site-author-name" itemprop="name">smalldok</p>
+           
+              <p class="site-description motion-element" itemprop="description">微服务/服务治理 springboot/springcloud/dubbo 服务注册与发现 zookeeper/eureka/consul/etcd 消息队列 rabbitmq/kafka API网关 kong/zuul 统一配置中心 统一任务调度平台 统一日志服务 ELK日志分析平台 分布式链路跟踪...</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/smalldok" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#拉取官方镜像"><span class="nav-number">2.</span> <span class="nav-text">拉取官方镜像</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#制作Dockerfile"><span class="nav-number">3.</span> <span class="nav-text">制作Dockerfile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#验证jenkins-plugin安装"><span class="nav-number">3.0.1.</span> <span class="nav-text">验证jenkins plugin安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#jenkins-plugin-list"><span class="nav-number">3.0.1.0.1.</span> <span class="nav-text">jenkins plugin list</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#jenkins-plugin-txt"><span class="nav-number">3.0.1.0.2.</span> <span class="nav-text">jenkins plugin.txt</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证JDK、GIT、SSH安装"><span class="nav-number">3.0.2.</span> <span class="nav-text">验证JDK、GIT、SSH安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证maven安装"><span class="nav-number">3.0.3.</span> <span class="nav-text">验证maven安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证nodejs安装"><span class="nav-number">3.0.4.</span> <span class="nav-text">验证nodejs安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dockerfile"><span class="nav-number">3.0.5.</span> <span class="nav-text">Dockerfile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-image"><span class="nav-number">3.0.6.</span> <span class="nav-text">Build image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Push-image"><span class="nav-number">3.0.7.</span> <span class="nav-text">Push image</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见问题"><span class="nav-number">4.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题1"><span class="nav-number">4.0.1.</span> <span class="nav-text">问题1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题2"><span class="nav-number">4.0.2.</span> <span class="nav-text">问题2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题3"><span class="nav-number">4.0.3.</span> <span class="nav-text">问题3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题4："><span class="nav-number">4.0.4.</span> <span class="nav-text">问题4：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题5："><span class="nav-number">4.0.5.</span> <span class="nav-text">问题5：</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">smalldok</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
