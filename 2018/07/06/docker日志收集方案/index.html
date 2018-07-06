@@ -1,0 +1,946 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="docker 日志收集方案容器日志采集：  基于docker api的日志流采集(stdout)； 日志文件采集（log file）  传统应用日志采集：  日志文件采集  工具选型：  支持文件日志和stdout 只支持文件日志 只支持stdout     工具名称 支持文件日志 支持stdout 使用感受     log-pilot yes yes 不错   filebeat yes no 6">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker日志收集方案">
+<meta property="og:url" content="https://smalldok.github.io/2018/07/06/docker日志收集方案/index.html">
+<meta property="og:site_name" content="Smalldok&#39;s Tech Blog">
+<meta property="og:description" content="docker 日志收集方案容器日志采集：  基于docker api的日志流采集(stdout)； 日志文件采集（log file）  传统应用日志采集：  日志文件采集  工具选型：  支持文件日志和stdout 只支持文件日志 只支持stdout     工具名称 支持文件日志 支持stdout 使用感受     log-pilot yes yes 不错   filebeat yes no 6">
+<meta property="og:image" content="https://smalldok.github.io/2018/07/06/docker日志收集方案/kibana-creat-index.png">
+<meta property="og:image" content="https://smalldok.github.io/2018/07/06/docker日志收集方案/kibana-showlog.png">
+<meta property="og:image" content="https://smalldok.github.io/2018/07/06/docker日志收集方案/flow1.png">
+<meta property="og:image" content="https://smalldok.github.io/2018/07/06/docker日志收集方案/flow2.png">
+<meta property="og:image" content="https://smalldok.github.io/2018/07/06/docker日志收集方案/flow3.png">
+<meta property="og:updated_time" content="2018-07-06T08:12:47.295Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="docker日志收集方案">
+<meta name="twitter:description" content="docker 日志收集方案容器日志采集：  基于docker api的日志流采集(stdout)； 日志文件采集（log file）  传统应用日志采集：  日志文件采集  工具选型：  支持文件日志和stdout 只支持文件日志 只支持stdout     工具名称 支持文件日志 支持stdout 使用感受     log-pilot yes yes 不错   filebeat yes no 6">
+<meta name="twitter:image" content="https://smalldok.github.io/2018/07/06/docker日志收集方案/kibana-creat-index.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://smalldok.github.io/2018/07/06/docker日志收集方案/"/>
+
+
+
+
+
+  <title>docker日志收集方案 | Smalldok's Tech Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6cc27890b716ee2ca5deb7aa76a254f3";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Smalldok's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">互联网基础设施</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2018/07/06/docker日志收集方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">docker日志收集方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T16:12:00+08:00">
+                2018-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/容器/" itemprop="url" rel="index">
+                    <span itemprop="name">容器</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="docker-日志收集方案"><a href="#docker-日志收集方案" class="headerlink" title="docker 日志收集方案"></a>docker 日志收集方案</h1><p>容器日志采集：</p>
+<ul>
+<li>基于docker api的日志流采集(stdout)；</li>
+<li>日志文件采集（log file）</li>
+</ul>
+<p>传统应用日志采集：</p>
+<ul>
+<li>日志文件采集</li>
+</ul>
+<p>工具选型：</p>
+<ul>
+<li>支持文件日志和stdout</li>
+<li>只支持文件日志</li>
+<li>只支持stdout</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>支持文件日志</th>
+<th>支持stdout</th>
+<th>使用感受</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>log-pilot</td>
+<td>yes</td>
+<td>yes</td>
+<td>不错</td>
+</tr>
+<tr>
+<td>filebeat</td>
+<td>yes</td>
+<td>no</td>
+<td>6.3.0版本总是读不到数据</td>
+</tr>
+<tr>
+<td>logspout</td>
+<td>no</td>
+<td>yes</td>
+<td>他的stdout实现与log-pilot一样,调用的docker api</td>
+</tr>
+<tr>
+<td>docker log dirver</td>
+<td>no</td>
+<td>yes</td>
+<td>dirver支持none/json-file/syslog/fluentd/..</td>
+</tr>
+</tbody>
+</table>
+<p>日志采集工具要点：</p>
+<ul>
+<li>尽量不要影响主机上的应用、占用资源越小越好，不过如果是容器应用的话倒是可以限制其使用的资源；</li>
+<li>是否支持灵活的日志标记，这样可以方便后续归类和数据分析，目前看下来log-pilot还不错；</li>
+</ul>
+<p>案例：</p>
+<ul>
+<li>tomcat既有stdout输出，也有文件日志输出(access.log)，这时你会选择哪个采集工具？</li>
+<li>java应用既有stdout输出(console)，也有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
+<li>xxx应用，只有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
+</ul>
+<h2 id="log-pilot"><a href="#log-pilot" class="headerlink" title="log-pilot"></a>log-pilot</h2><p>限定容器资源、用docker-compose启动<br>准备环境</p>
+<p>阿里开源：<a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="external">https://github.com/AliyunContainerService/log-pilot</a></p>
+<p>log-pilot 具有如下特性：</p>
+<ul>
+<li>一个单独的 log 进程收集机器上所有容器的日志。不需要为每个容器启动一个 log 进程。</li>
+<li>支持文件日志和 stdout。docker log dirver 亦或 logspout 只能处理 stdout，log-pilot 不仅支持收集 stdout 日志，还可以收集文件日志。</li>
+<li>声明式配置。当您的容器有日志要收集，只要通过 label 声明要收集的日志文件的路径，无需改动其他任何配置，log-pilot 就会自动收集新容器的日志。</li>
+<li>支持多种日志存储方式。无论是强大的阿里云日志服务，还是比较流行的 elasticsearch 组合，甚至是 graylog，log-pilot 都能把日志投递到正确的地点。</li>
+</ul>
+<h3 id="采集输出到console"><a href="#采集输出到console" class="headerlink" title="采集输出到console"></a>采集输出到console</h3><p>环境准备：一台主机<br>步骤： 先启动一个 log-pilot，再启动一个 tomcat 容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 打开一个终端，启动log-pilot容器（不要关闭终端, 观察控制台日志）</div><div class="line">docker run --name mypilot --rm -it \</div><div class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</div><div class="line">    -v /:/host \</div><div class="line">	--privileged  \</div><div class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</div><div class="line"><span class="meta"></span></div><div class="line"># 打开一个终端，启动tomcat容器</div><div class="line">docker run --name mytomcat -it --rm  -p 10080:8080 \</div><div class="line">-v /usr/local/tomcat/logs \</div><div class="line">--label aliyun.logs.catalina=stdout \</div><div class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt \</div><div class="line">tomcat</div></pre></td></tr></table></figure>
+<p>说明：</p>
+<ul>
+<li><code>aliyun.logs.catalina=stdout</code> 告诉 log-pilot 这个容器要收集 stdout 日志。</li>
+<li><code>aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</code> 则表示要收集容器内 /usr/local/tomcat/logs/ 目录下所有名字匹配 localhost_access_log.*.txt 的文件日志。后面会详细介绍 label 的用法。</li>
+</ul>
+<p>log-pilot 会监控 Docker 容器事件，当发现带有 aliyun.logs.xxx 容器时，自动解析容器配置，并且开始收集对应的日志。启动 tomcat 之后，会发现 log-pilot 的终端立即输出了一大堆的内容，其中包含 tomcat 启动时输出的 stdout 日志，也包括 log-pilot 自己输出的一些调试信息。</p>
+<p>可以打开浏览器访问刚刚部署的 tomcat，您会发现每次刷新浏览器，在 log-pilot 的终端里都能看到类似的记录。其中 message 后面的内容就是从 /usr/local/tomcat/logs/localhost_access_log.XXX.txt 里收集到的日志。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 打开一个终端，进入tomcat容器</div><div class="line">docker exec -it -u root mytomcat /bin/bash</div><div class="line"><span class="meta">#</span> 模拟浏览器访问tomcat</div><div class="line">curl 127.0.0.1:8080</div></pre></td></tr></table></figure>
+<h3 id="采集输出到ES-kibana"><a href="#采集输出到ES-kibana" class="headerlink" title="采集输出到ES+kibana"></a>采集输出到ES+kibana</h3><p>环境准备：一台主机(可以跟上面同一台主机)</p>
+<p>部署ELK</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 先在宿主机上执行如下命令</div><div class="line">sudo sysctl -w vm.max_map_count=262144</div><div class="line"><span class="meta"></span></div><div class="line"># 运行ELK容器</div><div class="line">docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 9300:9300 -it --name elk sebp/elk:630</div><div class="line"><span class="meta"></span></div><div class="line"># 检查</div><div class="line">浏览器访问kibana控制台  http://主机IP:5601</div><div class="line">浏览器访问es  http://主机IP:9200</div></pre></td></tr></table></figure>
+<p>重启log-pilot</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 关闭前面运行的log-pilot</div><div class="line">docker stop mypilot</div><div class="line">docker rm mypilot</div><div class="line"><span class="meta"></span></div><div class="line"># 启动log-pilot，注意替换ES所在的主机IP地址</div><div class="line">docker run --rm -it \</div><div class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</div><div class="line">    -v /:/host \</div><div class="line">    --privileged \</div><div class="line">    -e FLUENTD_OUTPUT=elasticsearch \</div><div class="line">    -e ELASTICSEARCH_HOST=172.17.0.3 \</div><div class="line">    -e ELASTICSEARCH_PORT=9200 \</div><div class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</div></pre></td></tr></table></figure>
+<p>相比前面启动 log-pilot 的方式，这里增加了三个环境变量：</p>
+<ul>
+<li>FLUENTD_OUTPUT=elasticsearch：把日志发送到 ElasticSearch。</li>
+<li>ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}：ElasticSearch 的域名。</li>
+<li>ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}：ElasticSearch 的端口号。</li>
+</ul>
+<p>继续运行前面的 tomcat，再次访问，让 tomcat 产生一些日志，所有这些新产生的日志都将发送到 ElasticSearch 里。</p>
+<p>打开 kibana，此时您还看不到新日志，需要先创建 index。log-pilot 会把日志写到 ElasticSearch 特定的 index下，规则如下：</p>
+<p>如果应用上使用了标签 <code>aliyun.logs.tags</code>，并且 <code>tags</code> 里包含 <code>target</code>，使用 <code>target</code> 作为 ElasticSearch 里的 index。否则，使用标签 <code>aliyun.logs.XXX</code> 里的 <code>XXX</code> 作为 index。</p>
+<p>在前面 tomcat 里的例子里，没有使用 <code>liyun.logs.tags</code> 标签，所以默认使用了 <code>access</code> 和 <code>catalina</code> 作为 index。我们先创建 index <code>access</code>。</p>
+<p><img src="/2018/07/06/docker日志收集方案/kibana-creat-index.png" alt="kibana-creat-index"><br>创建好 index 就可以查看日志了。<br><img src="/2018/07/06/docker日志收集方案/kibana-showlog.png" alt="kibana-creat-index"></p>
+<h3 id="使用编排文件运行log-pilot"><a href="#使用编排文件运行log-pilot" class="headerlink" title="使用编排文件运行log-pilot"></a>使用编排文件运行log-pilot</h3><p>log-pilot docker-compose.yml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"2"</span></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">    pilot:</span></div><div class="line"><span class="attr">      image:</span> <span class="string">registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</span></div><div class="line"><span class="attr">      volumes:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/var/run/docker.sock:/var/run/docker.sock</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/:/host</span></div><div class="line"><span class="attr">    privileged:</span> <span class="literal">true</span></div><div class="line"><span class="attr">    environment:</span></div><div class="line"><span class="attr">      FLUENTD_OUTPUT:</span> <span class="string">elasticsearch</span> <span class="comment">#按照您的需要替换</span></div><div class="line"><span class="attr">      ELASTICSEARCH_HOST:</span> <span class="string">$&#123;elasticsearch&#125;</span> <span class="comment">#按照您的需要替换</span></div><div class="line"><span class="attr">      ELASTICSEARCH_PORT:</span> <span class="number">9200</span></div><div class="line"><span class="attr">      logging:</span></div><div class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></div><div class="line"><span class="attr">        options:</span></div><div class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></div><div class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></div><div class="line"><span class="attr">    cpu_shares:</span> <span class="number">512</span>  <span class="comment">#限制CPU使用份额权重,默认1024</span></div><div class="line"><span class="attr">    mem_limit:</span> <span class="number">600</span><span class="string">m</span>  <span class="comment">#内存限制600M</span></div><div class="line"><span class="attr">    memswap_limit:</span> <span class="number">800</span><span class="string">m</span> <span class="comment">#内存+swap限制800M</span></div><div class="line"><span class="attr">      blkio_config:</span></div><div class="line"><span class="attr">        weight:</span> <span class="number">300</span> <span class="comment">#限制读写磁盘带宽,默认500,取值0-1000</span></div><div class="line"><span class="attr">      networks:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">webnet</span></div><div class="line"></div><div class="line"><span class="attr">networks:</span></div><div class="line"><span class="attr">    webnet:</span></div><div class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></div></pre></td></tr></table></figure>
+<p>查看限制的CPU、内存是否生效：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看CPU</div><div class="line">cat /sys/fs/cgroup/cpu/docker/&lt;容器长ID&gt;/cpu.shares</div><div class="line"><span class="meta"></span></div><div class="line"># 查看内存</div><div class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.limit_in_bytes</div><div class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.memsw.limit_in_bytes</div><div class="line"><span class="meta"></span></div><div class="line"># 或者直接查看容器详细信息</div><div class="line">docker inspect &lt;容器长ID&gt;</div></pre></td></tr></table></figure>
+<p>tomcat docker-compose.yml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"2"</span></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">    mytomcat:</span></div><div class="line"><span class="attr">      image:</span> <span class="attr">tomcat:latest</span></div><div class="line"><span class="attr">      ports:</span></div><div class="line"><span class="bullet">        -</span> <span class="number">8080</span><span class="string">:8080</span></div><div class="line"><span class="attr">      volumes:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/usr/local/tomcat/logs</span></div><div class="line"><span class="attr">      labels:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.catalina=stdout"</span></div><div class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt"</span></div><div class="line"><span class="attr">      logging:</span></div><div class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></div><div class="line"><span class="attr">        options:</span></div><div class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></div><div class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></div><div class="line"><span class="attr">      networks:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">webnet</span></div><div class="line"></div><div class="line"><span class="attr">networks:</span></div><div class="line"><span class="attr">    webnet:</span></div><div class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></div></pre></td></tr></table></figure>
+<p>运行容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">docker-compose -f mylogpilot.yml up</div><div class="line">docker-compose -f mytomcat.yml up</div></pre></td></tr></table></figure>
+<h3 id="label-说明"><a href="#label-说明" class="headerlink" title="label 说明"></a>label 说明</h3><p>启动 tomcat 时，声明了下面两个 label 来告诉 log-pilot 这个容器的日志位置。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">--label aliyun.logs.catalina=stdout</div><div class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</div></pre></td></tr></table></figure>
+<p>您还可以在应用容器上添加更多的标签。</p>
+<ul>
+<li><code>aliyun.logs.$name = $path</code><ul>
+<li>变量 <code>name</code> 是日志名称，只能包含 0~9、a~z、A~Z 和连字符（-）。</li>
+<li>变量 <code>path</code> 是要收集的日志路径，必须具体到文件，不能只写目录。文件名部分可以使用通配符，例如，<code>/var/log/he.log</code> 和 <code>/var/log/*.log</code> 都是正确的值，但 <code>/var/log</code> 不行，不能只写到目录。<code>stdout</code> 是一个特殊值，表示标准输出。</li>
+</ul>
+</li>
+<li><code>aliyun.logs.$name.format</code>：日志格式，目前支持以下格式。<ul>
+<li>none：无格式纯文本。</li>
+<li>json：json 格式，每行一个完整的 json 字符串。</li>
+<li>csv：csv 格式。</li>
+</ul>
+</li>
+<li><p><code>aliyun.logs.$name.tags</code>：上报日志时，额外增加的字段，格式为 <code>k1=v1,k2=v2</code>，每个 key-value 之间使用逗号分隔，例如 <code>aliyun.logs.access.tags=&quot;name=hello,stage=test&quot;</code>，上报到存储的日志里就会出现 <code>name</code> 字段和 <code>stage</code> 字段。</p>
+<p>如果使用 ElasticSearch 作为日志存储，<code>target</code> 这个 tag 具有特殊含义，表示 ElasticSearch 里对应的 index。</p>
+</li>
+</ul>
+<h3 id="最后的思考"><a href="#最后的思考" class="headerlink" title="最后的思考"></a>最后的思考</h3><ul>
+<li>采集到重复数据问题，比如采集程序重启之后，读到重复数据，是否有排重？根据什么规则排重？</li>
+<li>采集数据是否会发生遗漏，比如采集程序重启之后，是否有标记最后读取的位置</li>
+<li>采集输出到后端，是否有过滤，或者可以自定义过滤</li>
+<li>采集输出到后端，是否尽量保证不丢失，采用的策略是什么</li>
+</ul>
+<p>如果log-pilot做不到上述事情,或者扩展起来麻烦，则考虑自己写个agent, 起码自己写的程序，知道如何驾驭;</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>log-pilot官方<br><a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="external">https://github.com/AliyunContainerService/log-pilot</a><br><a href="https://helpcdn.aliyun.com/document_detail/50441.html" target="_blank" rel="external">https://helpcdn.aliyun.com/document_detail/50441.html</a>  </li>
+<li>Docker日志收集最佳实践<br><a href="https://yq.aliyun.com/articles/72700" target="_blank" rel="external">https://yq.aliyun.com/articles/72700</a></li>
+<li>logspout<br><a href="https://github.com/gliderlabs/logspout" target="_blank" rel="external">https://github.com/gliderlabs/logspout</a></li>
+<li>logspout 网友扩展<br><a href="https://www.jianshu.com/p/bd482c13ea66" target="_blank" rel="external">https://www.jianshu.com/p/bd482c13ea66</a></li>
+</ul>
+<h1 id="几种采集架构图"><a href="#几种采集架构图" class="headerlink" title="几种采集架构图"></a>几种采集架构图</h1><ul>
+<li><p>业务埋点数据、应用日志数据<br>log-pilot-&gt;kafka-&gt;logstash-&gt;es-&gt;kibana<br>log-pilot-&gt;kafka-&gt;storm/spark<br><img src="/2018/07/06/docker日志收集方案/flow1.png" alt="flow1"></p>
+</li>
+<li><p>应用日志数据<br>log-pilot-&gt;logstash-&gt;es-&gt;kibana<br><img src="/2018/07/06/docker日志收集方案/flow2.png" alt="flow2"></p>
+</li>
+<li><p>采集文件日志<br>采集工具可以用log-pilot、filebeat、fluentd、flume、….<br><img src="/2018/07/06/docker日志收集方案/flow3.png" alt="flow3"></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/13/docker构建jenkins image/" rel="next" title="Docker构建Jenkins image">
+                <i class="fa fa-chevron-left"></i> Docker构建Jenkins image
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar1.jpg"
+               alt="smalldok" />
+          <p class="site-author-name" itemprop="name">smalldok</p>
+           
+              <p class="site-description motion-element" itemprop="description">微服务/服务治理 springboot/springcloud/dubbo 服务注册与发现 zookeeper/eureka/consul/etcd 消息队列 rabbitmq/kafka API网关 kong/zuul 统一配置中心 统一任务调度平台 统一日志服务 ELK日志分析平台 分布式链路跟踪...</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/smalldok" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#docker-日志收集方案"><span class="nav-number">1.</span> <span class="nav-text">docker 日志收集方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#log-pilot"><span class="nav-number">1.1.</span> <span class="nav-text">log-pilot</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#采集输出到console"><span class="nav-number">1.1.1.</span> <span class="nav-text">采集输出到console</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#采集输出到ES-kibana"><span class="nav-number">1.1.2.</span> <span class="nav-text">采集输出到ES+kibana</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用编排文件运行log-pilot"><span class="nav-number">1.1.3.</span> <span class="nav-text">使用编排文件运行log-pilot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#label-说明"><span class="nav-number">1.1.4.</span> <span class="nav-text">label 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后的思考"><span class="nav-number">1.1.5.</span> <span class="nav-text">最后的思考</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.2.</span> <span class="nav-text">参考</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#几种采集架构图"><span class="nav-number">2.</span> <span class="nav-text">几种采集架构图</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">smalldok</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
