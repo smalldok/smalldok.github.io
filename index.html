@@ -306,7 +306,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2018/07/06/docker日志收集方案/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2018/07/09/docker run --restart and --rm/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -325,7 +325,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/07/06/docker日志收集方案/" itemprop="url">docker日志收集方案</a></h1>
+                <a class="post-title-link" href="/2018/07/09/docker run --restart and --rm/" itemprop="url">docker run --restart and --rm</a></h1>
         
 
         <div class="post-meta">
@@ -337,8 +337,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T16:12:00+08:00">
-                2018-07-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-09T10:12:00+08:00">
+                2018-07-09
               </time>
             
 
@@ -396,340 +396,26 @@
       
         
           
-            <h1 id="docker-日志收集方案"><a href="#docker-日志收集方案" class="headerlink" title="docker 日志收集方案"></a>docker 日志收集方案</h1><p>容器日志采集：</p>
+            <h1 id="Docker容器的重启策略"><a href="#Docker容器的重启策略" class="headerlink" title="Docker容器的重启策略"></a>Docker容器的重启策略</h1><p>Docker容器的重启策略是面向生产环境的一个启动策略，在开发过程中可以忽略该策略。<br>Docker容器的重启都是由Docker守护进程完成的，因此与守护进程息息相关。  </p>
+<p>Docker容器的重启策略如下：</p>
 <ul>
-<li>基于docker api的日志流采集(stdout)；</li>
-<li>日志文件采集（log file）</li>
+<li>no，默认策略，在容器退出时不重启容器</li>
+<li>on-failure，在容器非正常退出时（退出状态非0），才会重启容器<br>on-failure:3，在容器非正常退出时重启容器，最多重启3次</li>
+<li>always，在容器退出时总是重启容器</li>
+<li>unless-stopped，在容器退出时总是重启容器，但是不考虑在Docker守护进程启动时就已经停止了的容器</li>
 </ul>
-<p>传统应用日志采集：</p>
-<ul>
-<li>日志文件采集</li>
-</ul>
-<p>工具选型：</p>
-<ul>
-<li>支持文件日志和stdout</li>
-<li>只支持文件日志</li>
-<li>只支持stdout</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>工具名称</th>
-<th>支持文件日志</th>
-<th>支持stdout</th>
-<th>使用感受</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>log-pilot</td>
-<td>yes</td>
-<td>yes</td>
-<td>不错</td>
-</tr>
-<tr>
-<td>filebeat</td>
-<td>yes</td>
-<td>no</td>
-<td>6.3.0版本总是读不到数据</td>
-</tr>
-<tr>
-<td>logspout</td>
-<td>no</td>
-<td>yes</td>
-<td>他的stdout实现与log-pilot一样,调用的docker api</td>
-</tr>
-<tr>
-<td>docker log dirver</td>
-<td>no</td>
-<td>yes</td>
-<td>dirver支持none/json-file/syslog/fluentd/..</td>
-</tr>
-</tbody>
-</table>
-<p>日志采集工具要点：</p>
-<ul>
-<li>尽量不要影响主机上的应用、占用资源越小越好，不过如果是容器应用的话倒是可以限制其使用的资源；</li>
-<li>是否支持灵活的日志标记，这样可以方便后续归类和数据分析，目前看下来log-pilot还不错；</li>
-</ul>
-<p>案例：</p>
-<ul>
-<li>tomcat既有stdout输出，也有文件日志输出(access.log)，这时你会选择哪个采集工具？</li>
-<li>java应用既有stdout输出(console)，也有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
-<li>xxx应用，只有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
-</ul>
-<h2 id="log-pilot"><a href="#log-pilot" class="headerlink" title="log-pilot"></a>log-pilot</h2><p>限定容器资源、用docker-compose启动<br>准备环境</p>
-<p>阿里开源：<a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="external">https://github.com/AliyunContainerService/log-pilot</a></p>
-<p>log-pilot 具有如下特性：</p>
-<ul>
-<li>一个单独的 log 进程收集机器上所有容器的日志。不需要为每个容器启动一个 log 进程。</li>
-<li>支持文件日志和 stdout。docker log dirver 亦或 logspout 只能处理 stdout，log-pilot 不仅支持收集 stdout 日志，还可以收集文件日志。</li>
-<li>声明式配置。当您的容器有日志要收集，只要通过 label 声明要收集的日志文件的路径，无需改动其他任何配置，log-pilot 就会自动收集新容器的日志。</li>
-<li>支持多种日志存储方式。无论是强大的阿里云日志服务，还是比较流行的 elasticsearch 组合，甚至是 graylog，log-pilot 都能把日志投递到正确的地点。</li>
-</ul>
-<h3 id="采集输出到console"><a href="#采集输出到console" class="headerlink" title="采集输出到console"></a>采集输出到console</h3><p>环境准备：一台主机<br>步骤： 先启动一个 log-pilot，再启动一个 tomcat 容器</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 打开一个终端，启动log-pilot容器（不要关闭终端, 观察控制台日志）</div><div class="line">docker run --name mypilot --rm -it \</div><div class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</div><div class="line">    -v /:/host \</div><div class="line">	--privileged  \</div><div class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</div><div class="line"><span class="meta"></span></div><div class="line"># 打开一个终端，启动tomcat容器</div><div class="line">docker run --name mytomcat -it --rm  -p 10080:8080 \</div><div class="line">-v /usr/local/tomcat/logs \</div><div class="line">--label aliyun.logs.catalina=stdout \</div><div class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt \</div><div class="line">tomcat</div></pre></td></tr></table></figure>
-<p>说明：</p>
-<ul>
-<li><code>aliyun.logs.catalina=stdout</code> 告诉 log-pilot 这个容器要收集 stdout 日志。</li>
-<li><code>aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</code> 则表示要收集容器内 /usr/local/tomcat/logs/ 目录下所有名字匹配 localhost_access_log.*.txt 的文件日志。后面会详细介绍 label 的用法。</li>
-</ul>
-<p>log-pilot 会监控 Docker 容器事件，当发现带有 aliyun.logs.xxx 容器时，自动解析容器配置，并且开始收集对应的日志。启动 tomcat 之后，会发现 log-pilot 的终端立即输出了一大堆的内容，其中包含 tomcat 启动时输出的 stdout 日志，也包括 log-pilot 自己输出的一些调试信息。</p>
-<p>可以打开浏览器访问刚刚部署的 tomcat，您会发现每次刷新浏览器，在 log-pilot 的终端里都能看到类似的记录。其中 message 后面的内容就是从 /usr/local/tomcat/logs/localhost_access_log.XXX.txt 里收集到的日志。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 打开一个终端，进入tomcat容器</div><div class="line">docker exec -it -u root mytomcat /bin/bash</div><div class="line"><span class="meta">#</span> 模拟浏览器访问tomcat</div><div class="line">curl 127.0.0.1:8080</div></pre></td></tr></table></figure>
-<h3 id="采集输出到ES-kibana"><a href="#采集输出到ES-kibana" class="headerlink" title="采集输出到ES+kibana"></a>采集输出到ES+kibana</h3><p>环境准备：一台主机(可以跟上面同一台主机)</p>
-<p>部署ELK</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 先在宿主机上执行如下命令</div><div class="line">sudo sysctl -w vm.max_map_count=262144</div><div class="line"><span class="meta"></span></div><div class="line"># 运行ELK容器</div><div class="line">docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 9300:9300 -it --name elk sebp/elk:630</div><div class="line"><span class="meta"></span></div><div class="line"># 检查</div><div class="line">浏览器访问kibana控制台  http://主机IP:5601</div><div class="line">浏览器访问es  http://主机IP:9200</div></pre></td></tr></table></figure>
-<p>重启log-pilot</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 关闭前面运行的log-pilot</div><div class="line">docker stop mypilot</div><div class="line">docker rm mypilot</div><div class="line"><span class="meta"></span></div><div class="line"># 启动log-pilot，注意替换ES所在的主机IP地址</div><div class="line">docker run --rm -it \</div><div class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</div><div class="line">    -v /:/host \</div><div class="line">    --privileged \</div><div class="line">    -e FLUENTD_OUTPUT=elasticsearch \</div><div class="line">    -e ELASTICSEARCH_HOST=172.17.0.3 \</div><div class="line">    -e ELASTICSEARCH_PORT=9200 \</div><div class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</div></pre></td></tr></table></figure>
-<p>相比前面启动 log-pilot 的方式，这里增加了三个环境变量：</p>
-<ul>
-<li>FLUENTD_OUTPUT=elasticsearch：把日志发送到 ElasticSearch。</li>
-<li>ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}：ElasticSearch 的域名。</li>
-<li>ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}：ElasticSearch 的端口号。</li>
-</ul>
-<p>继续运行前面的 tomcat，再次访问，让 tomcat 产生一些日志，所有这些新产生的日志都将发送到 ElasticSearch 里。</p>
-<p>打开 kibana，此时您还看不到新日志，需要先创建 index。log-pilot 会把日志写到 ElasticSearch 特定的 index下，规则如下：</p>
-<p>如果应用上使用了标签 <code>aliyun.logs.tags</code>，并且 <code>tags</code> 里包含 <code>target</code>，使用 <code>target</code> 作为 ElasticSearch 里的 index。否则，使用标签 <code>aliyun.logs.XXX</code> 里的 <code>XXX</code> 作为 index。</p>
-<p>在前面 tomcat 里的例子里，没有使用 <code>liyun.logs.tags</code> 标签，所以默认使用了 <code>access</code> 和 <code>catalina</code> 作为 index。我们先创建 index <code>access</code>。</p>
-<p><img src="/2018/07/06/docker日志收集方案/kibana-creat-index.png" alt="kibana-creat-index"><br>创建好 index 就可以查看日志了。<br><img src="/2018/07/06/docker日志收集方案/kibana-showlog.png" alt="kibana-creat-index"></p>
-<h3 id="使用编排文件运行log-pilot"><a href="#使用编排文件运行log-pilot" class="headerlink" title="使用编排文件运行log-pilot"></a>使用编排文件运行log-pilot</h3><p>log-pilot docker-compose.yml</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"2"</span></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">    pilot:</span></div><div class="line"><span class="attr">      image:</span> <span class="string">registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</span></div><div class="line"><span class="attr">      volumes:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/var/run/docker.sock:/var/run/docker.sock</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/:/host</span></div><div class="line"><span class="attr">    privileged:</span> <span class="literal">true</span></div><div class="line"><span class="attr">    environment:</span></div><div class="line"><span class="attr">      FLUENTD_OUTPUT:</span> <span class="string">elasticsearch</span> <span class="comment">#按照您的需要替换</span></div><div class="line"><span class="attr">      ELASTICSEARCH_HOST:</span> <span class="string">$&#123;elasticsearch&#125;</span> <span class="comment">#按照您的需要替换</span></div><div class="line"><span class="attr">      ELASTICSEARCH_PORT:</span> <span class="number">9200</span></div><div class="line"><span class="attr">      logging:</span></div><div class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></div><div class="line"><span class="attr">        options:</span></div><div class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></div><div class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></div><div class="line"><span class="attr">    cpu_shares:</span> <span class="number">512</span>  <span class="comment">#限制CPU使用份额权重,默认1024</span></div><div class="line"><span class="attr">    mem_limit:</span> <span class="number">600</span><span class="string">m</span>  <span class="comment">#内存限制600M</span></div><div class="line"><span class="attr">    memswap_limit:</span> <span class="number">800</span><span class="string">m</span> <span class="comment">#内存+swap限制800M</span></div><div class="line"><span class="attr">      blkio_config:</span></div><div class="line"><span class="attr">        weight:</span> <span class="number">300</span> <span class="comment">#限制读写磁盘带宽,默认500,取值0-1000</span></div><div class="line"><span class="attr">      networks:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">webnet</span></div><div class="line"></div><div class="line"><span class="attr">networks:</span></div><div class="line"><span class="attr">    webnet:</span></div><div class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></div></pre></td></tr></table></figure>
-<p>查看限制的CPU、内存是否生效：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看CPU</div><div class="line">cat /sys/fs/cgroup/cpu/docker/&lt;容器长ID&gt;/cpu.shares</div><div class="line"><span class="meta"></span></div><div class="line"># 查看内存</div><div class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.limit_in_bytes</div><div class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.memsw.limit_in_bytes</div><div class="line"><span class="meta"></span></div><div class="line"># 或者直接查看容器详细信息</div><div class="line">docker inspect &lt;容器长ID&gt;</div></pre></td></tr></table></figure>
-<p>tomcat docker-compose.yml</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"2"</span></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">    mytomcat:</span></div><div class="line"><span class="attr">      image:</span> <span class="attr">tomcat:latest</span></div><div class="line"><span class="attr">      ports:</span></div><div class="line"><span class="bullet">        -</span> <span class="number">8080</span><span class="string">:8080</span></div><div class="line"><span class="attr">      volumes:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/usr/local/tomcat/logs</span></div><div class="line"><span class="attr">      labels:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.catalina=stdout"</span></div><div class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt"</span></div><div class="line"><span class="attr">      logging:</span></div><div class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></div><div class="line"><span class="attr">        options:</span></div><div class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></div><div class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></div><div class="line"><span class="attr">      networks:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">webnet</span></div><div class="line"></div><div class="line"><span class="attr">networks:</span></div><div class="line"><span class="attr">    webnet:</span></div><div class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></div></pre></td></tr></table></figure>
-<p>运行容器</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">docker-compose -f mylogpilot.yml up</div><div class="line">docker-compose -f mytomcat.yml up</div></pre></td></tr></table></figure>
-<h3 id="label-说明"><a href="#label-说明" class="headerlink" title="label 说明"></a>label 说明</h3><p>启动 tomcat 时，声明了下面两个 label 来告诉 log-pilot 这个容器的日志位置。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">--label aliyun.logs.catalina=stdout</div><div class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</div></pre></td></tr></table></figure>
-<p>您还可以在应用容器上添加更多的标签。</p>
-<ul>
-<li><code>aliyun.logs.$name = $path</code><ul>
-<li>变量 <code>name</code> 是日志名称，只能包含 0~9、a~z、A~Z 和连字符（-）。</li>
-<li>变量 <code>path</code> 是要收集的日志路径，必须具体到文件，不能只写目录。文件名部分可以使用通配符，例如，<code>/var/log/he.log</code> 和 <code>/var/log/*.log</code> 都是正确的值，但 <code>/var/log</code> 不行，不能只写到目录。<code>stdout</code> 是一个特殊值，表示标准输出。</li>
-</ul>
-</li>
-<li><code>aliyun.logs.$name.format</code>：日志格式，目前支持以下格式。<ul>
-<li>none：无格式纯文本。</li>
-<li>json：json 格式，每行一个完整的 json 字符串。</li>
-<li>csv：csv 格式。</li>
-</ul>
-</li>
-<li><p><code>aliyun.logs.$name.tags</code>：上报日志时，额外增加的字段，格式为 <code>k1=v1,k2=v2</code>，每个 key-value 之间使用逗号分隔，例如 <code>aliyun.logs.access.tags=&quot;name=hello,stage=test&quot;</code>，上报到存储的日志里就会出现 <code>name</code> 字段和 <code>stage</code> 字段。</p>
-<p>如果使用 ElasticSearch 作为日志存储，<code>target</code> 这个 tag 具有特殊含义，表示 ElasticSearch 里对应的 index。</p>
-</li>
-</ul>
-<h3 id="最后的思考"><a href="#最后的思考" class="headerlink" title="最后的思考"></a>最后的思考</h3><ul>
-<li>采集到重复数据问题，比如采集程序重启之后，读到重复数据，是否有排重？根据什么规则排重？</li>
-<li>采集数据是否会发生遗漏，比如采集程序重启之后，是否有标记最后读取的位置</li>
-<li>采集输出到后端，是否有过滤，或者可以自定义过滤</li>
-<li>采集输出到后端，是否尽量保证不丢失，采用的策略是什么</li>
-</ul>
-<p>如果log-pilot做不到上述事情,或者扩展起来麻烦，则考虑自己写个agent, 起码自己写的程序，知道如何驾驭;</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li>log-pilot官方<br><a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="external">https://github.com/AliyunContainerService/log-pilot</a><br><a href="https://helpcdn.aliyun.com/document_detail/50441.html" target="_blank" rel="external">https://helpcdn.aliyun.com/document_detail/50441.html</a>  </li>
-<li>Docker日志收集最佳实践<br><a href="https://yq.aliyun.com/articles/72700" target="_blank" rel="external">https://yq.aliyun.com/articles/72700</a></li>
-<li>logspout<br><a href="https://github.com/gliderlabs/logspout" target="_blank" rel="external">https://github.com/gliderlabs/logspout</a></li>
-<li>logspout 网友扩展<br><a href="https://www.jianshu.com/p/bd482c13ea66" target="_blank" rel="external">https://www.jianshu.com/p/bd482c13ea66</a></li>
-</ul>
-<h1 id="几种采集架构图"><a href="#几种采集架构图" class="headerlink" title="几种采集架构图"></a>几种采集架构图</h1><ul>
-<li><p>业务埋点数据、应用日志数据<br>log-pilot-&gt;kafka-&gt;logstash-&gt;es-&gt;kibana<br>log-pilot-&gt;kafka-&gt;storm/spark<br><img src="/2018/07/06/docker日志收集方案/flow1.png" alt="flow1"></p>
-</li>
-<li><p>应用日志数据<br>log-pilot-&gt;logstash-&gt;es-&gt;kibana<br><img src="/2018/07/06/docker日志收集方案/flow2.png" alt="flow2"></p>
-</li>
-<li><p>采集文件日志<br>采集工具可以用log-pilot、filebeat、fluentd、flume、….<br><img src="/2018/07/06/docker日志收集方案/flow3.png" alt="flow3"></p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2018/07/06/docker save-load and export-import/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="smalldok">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Smalldok's Tech Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/06/docker save-load and export-import/" itemprop="url">docker save-load and export-import</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T16:12:00+08:00">
-                2018-07-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/容器/" itemprop="url" rel="index">
-                    <span itemprop="name">容器</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="docker-镜像导入导出"><a href="#docker-镜像导入导出" class="headerlink" title="docker 镜像导入导出"></a>docker 镜像导入导出</h1><p>两组导入导出命令：  </p>
-<ul>
-<li>docker save/load</li>
-<li>docker export/import</li>
-</ul>
-<p>两种使用场景(两者可以结合使用)： </p>
-<table>
-<thead>
-<tr>
-<th>命令</th>
-<th>场景</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>save/load</td>
-<td>如果部署的节点服务器不能连外部或者内部镜像仓库，则可以docker save镜像打包，然后拷贝上传到要部署的节点服务其上，使用docker load载入</td>
-</tr>
-<tr>
-<td>export/import</td>
-<td>用于制作基础镜像，比如容器启动后，在容器中安装一些软件或者环境的设置，使用docker export导出修改后的容器，然后分发给其他人使用(比如作为基础的开发环境)</td>
-</tr>
-</tbody>
-</table>
-<p>也可以使用docker commit命令，提交修改后的容器，并上传至镜像仓库;<br>注意：用docker commit命令打包的镜像，比Dockerfile方式打出的镜像大(镜像分层问题)</p>
-<h1 id="测试环境准备"><a href="#测试环境准备" class="headerlink" title="测试环境准备"></a>测试环境准备</h1><p>步骤：</p>
-<ul>
-<li>构建一个centos镜像</li>
-<li>进入容器安装软件</li>
-<li>配置防火墙</li>
-<li>提交容器修改</li>
-</ul>
-<p>构建镜像、运行容器、进入容器后台</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone https://github.com/smalldok/docker-based-tools.git</div><div class="line"><span class="meta">$</span> cd dind_centos</div><div class="line"><span class="meta">$</span> docker build -t dind_centos .</div><div class="line"><span class="meta">$</span> docker run --name docker-0 --privileged -d dind_centos</div><div class="line"><span class="meta">$</span> docker exec -it -u root docker-0 /bin/bash</div></pre></td></tr></table></figure>
-<p>安装软件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 安装支持ifconfig命令的工具</div><div class="line">yum install net-tools</div><div class="line"><span class="meta"></span></div><div class="line"># 安装firewalld</div><div class="line">yum install firewalld firewall-config</div><div class="line">systemctl start  firewalld # 启动</div></pre></td></tr></table></figure>
-<p>开放docker-swarm需要的端口</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 开放防火墙端口</div><div class="line">firewall-cmd --permanent --add-port=2377/tcp</div><div class="line">firewall-cmd --permanent --add-port=7946/tcp</div><div class="line">firewall-cmd --permanent --add-port=7946/udp</div><div class="line">firewall-cmd --permanent --add-port=4789/udp</div><div class="line">firewall-cmd --reload # 永久打开端口需要reload一下</div><div class="line">firewall-cmd --list-all # 查看防火墙，添加的端口也可以看到</div></pre></td></tr></table></figure>
-<h1 id="docker-export-import"><a href="#docker-export-import" class="headerlink" title="docker export/import"></a>docker export/import</h1><ul>
-<li>docker export<br>docker export是将container的文件系统打包; </li>
-<li>docker import<br>docker import将container导入后成为一个Image,而不是恢复为一个container;<br>可指定image[:tag]，为镜像指定新名称；如果名称相同，则会覆盖老的镜像；</li>
-</ul>
-<p><code>docker export 导出容器</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> docker ps</div><div class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                        NAMES</div><div class="line">1eb256b1d4b1        dind_centos         "wrapdocker /usr/sbi…"   About an hour ago   Up About an hour       docker-0</div><div class="line"><span class="meta"></span></div><div class="line">$ docker export 1eb256b1d4b1 &gt; dind_centos.tar</div></pre></td></tr></table></figure>
-<p><code>docker import 导入</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> docker import dind_centos.tar dind_centos:1.0</div><div class="line">sha256:4e8612dad5ba4230e618a424727a679e0f52f7a1fcfb16bbfe5626338784d404</div><div class="line"><span class="meta"></span></div><div class="line">$ docker images</div><div class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</div><div class="line">dind_centos         1.0                 4e8612dad5ba        20 seconds ago      539MB</div><div class="line">dind_centos         latest              9031f35e0ec5        4 days ago          550MB</div><div class="line">centos              latest              49f7960eb7e4        3 weeks ago         200MB</div></pre></td></tr></table></figure>
-<p><code>查看之前对容器的修改是否还在</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 运行容器</div><div class="line"><span class="meta">$</span> docker run --name docker-test --privileged -d dind_centos:1.0 wrapdocker /usr/sbin/init</div><div class="line">960ecfc2f531533ba36c3cefb00fa9f784cdafd14a898577c52262f03d3faede</div><div class="line"><span class="meta"></span></div><div class="line"># 查看ifconfig是否生效</div><div class="line"><span class="meta">$</span> ifconfig</div></pre></td></tr></table></figure>
-<h1 id="docker-save-load"><a href="#docker-save-load" class="headerlink" title="docker save/load"></a>docker save/load</h1><ul>
-<li><p>docker save<br>docker save 可以对image或者container打包；对container打包，其实打的是容器背后的image;<br>docker save 可以用来将一个或者多个Image打包，如： </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 打包之后的test.tar包含nginx:1.0 httpd:1.4这两个镜像</div><div class="line">docker save -o test.tar nginx:1.0 httpd:1.4</div></pre></td></tr></table></figure>
-</li>
-<li><p>docker load  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 该命令会把nginx:1.0 httpd:1.4载入进来，如果本地已经存在这两个镜像，会被覆盖</div><div class="line">docker load -i test.tar</div></pre></td></tr></table></figure>
-</li>
-</ul>
+<h1 id="docker-run的–restart选项"><a href="#docker-run的–restart选项" class="headerlink" title="docker run的–restart选项"></a>docker run的–restart选项</h1><p>通过<code>--restart</code>选项，可以设置容器的重启策略，以决定在容器退出时Docker守护进程是否重启刚刚退出的容器。<br><code>--restart</code>选项通常只用于detached模式的容器。<br><code>--restart</code>选项不能与<code>--rm</code>选项同时使用。显然，<code>--restart</code>选项适用于detached模式的容器，而<code>--rm</code>选项适用于foreground模式的容器。</p>
+<p>在<code>docker ps</code>查看容器时，对于使用了<code>--restart</code>选项的容器，其可能的状态只有<code>Up</code>或<code>Restarting</code>两种状态。</p>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">docker run -d --restart=always bba-208</div><div class="line">docker run -d --restart=on-failure:10 bba-208</div></pre></td></tr></table></figure>
+<p>补充：</p>
+<p>查看容器重启次数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker inspect -f &quot;&#123;&#123; .RestartCount &#125;&#125;&quot; bba-208</div></pre></td></tr></table></figure>
+<p>查看容器最后一次的启动时间<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker inspect -f &quot;&#123;&#123; .State.StartedAt &#125;&#125;&quot; bba-208</div></pre></td></tr></table></figure></p>
+<h1 id="docker-run的–rm选项"><a href="#docker-run的–rm选项" class="headerlink" title="docker run的–rm选项"></a>docker run的–rm选项</h1><p>在Docker容器退出时，默认容器内部的文件系统仍然被保留，以方便调试并保留用户数据。<br>但是，对于foreground容器，由于其只是在开发调试过程中短期运行，其用户数据并无保留的必要，因而可以在容器启动时设置<code>--rm</code>选项，这样在容器退出时就能够自动清理容器内部的文件系统。示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --rm bba-208</div></pre></td></tr></table></figure></p>
+<p>等价于<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --rm=true bba-208</div></pre></td></tr></table></figure></p>
+<p>显然，<code>--rm</code>选项不能与<code>-d</code>同时使用，即只能自动清理foreground容器，不能自动清理detached容器<br>注意，<code>--rm</code>选项也会清理容器的匿名data volumes。</p>
+<p>所以，执行<code>docker run</code>命令带<code>--rm</code>命令选项，等价于在容器退出后，执行<code>docker rm -v</code>。</p>
 
           
         
@@ -1163,6 +849,473 @@
 <p>方法一：暴力清除<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看哪个目录占用空间最大</div><div class="line">du -sh /*</div><div class="line"><span class="meta">#</span> 停止docker服务</div><div class="line">systemctl stop docker</div><div class="line"><span class="meta">#</span> 删除/var/lib/docker目录下的所有文件</div><div class="line">rm -rf /var/lib/docker</div><div class="line"><span class="meta">#</span> 启动docker服务</div><div class="line">systemctl start docker</div></pre></td></tr></table></figure></p>
 <p>注意：docker 服务重启后，需要重新加入集群节点<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker swarm join --token SWMTKN-1-3d7ynvjvs9kqdqaut2sir2ky42uoiv54fmwef5s7odei33a031-3rcwr1styfzw8f8j3k9mvbz9c 172.17.0.2:2377</div></pre></td></tr></table></figure></p>
 <p>方法二： 转移/var/lib/docker目录<br>略…</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2018/07/06/docker日志收集方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/06/docker日志收集方案/" itemprop="url">docker日志收集方案</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T16:12:00+08:00">
+                2018-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/容器/" itemprop="url" rel="index">
+                    <span itemprop="name">容器</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="docker-日志收集方案"><a href="#docker-日志收集方案" class="headerlink" title="docker 日志收集方案"></a>docker 日志收集方案</h1><p>容器日志采集：</p>
+<ul>
+<li>基于docker api的日志流采集(stdout)；</li>
+<li>日志文件采集（log file）</li>
+</ul>
+<p>传统应用日志采集：</p>
+<ul>
+<li>日志文件采集</li>
+</ul>
+<p>工具选型：</p>
+<ul>
+<li>支持文件日志和stdout</li>
+<li>只支持文件日志</li>
+<li>只支持stdout</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>支持文件日志</th>
+<th>支持stdout</th>
+<th>使用感受</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>log-pilot</td>
+<td>yes</td>
+<td>yes</td>
+<td>不错</td>
+</tr>
+<tr>
+<td>filebeat</td>
+<td>yes</td>
+<td>no</td>
+<td>6.3.0版本总是读不到数据</td>
+</tr>
+<tr>
+<td>logspout</td>
+<td>no</td>
+<td>yes</td>
+<td>他的stdout实现与log-pilot一样,调用的docker api</td>
+</tr>
+<tr>
+<td>docker log dirver</td>
+<td>no</td>
+<td>yes</td>
+<td>dirver支持none/json-file/syslog/fluentd/..</td>
+</tr>
+</tbody>
+</table>
+<p>日志采集工具要点：</p>
+<ul>
+<li>尽量不要影响主机上的应用、占用资源越小越好，不过如果是容器应用的话倒是可以限制其使用的资源；</li>
+<li>是否支持灵活的日志标记，这样可以方便后续归类和数据分析，目前看下来log-pilot还不错；</li>
+</ul>
+<p>案例：</p>
+<ul>
+<li>tomcat既有stdout输出，也有文件日志输出(access.log)，这时你会选择哪个采集工具？</li>
+<li>java应用既有stdout输出(console)，也有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
+<li>xxx应用，只有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
+</ul>
+<h2 id="log-pilot"><a href="#log-pilot" class="headerlink" title="log-pilot"></a>log-pilot</h2><p>限定容器资源、用docker-compose启动<br>准备环境</p>
+<p>阿里开源：<a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="external">https://github.com/AliyunContainerService/log-pilot</a></p>
+<p>log-pilot 具有如下特性：</p>
+<ul>
+<li>一个单独的 log 进程收集机器上所有容器的日志。不需要为每个容器启动一个 log 进程。</li>
+<li>支持文件日志和 stdout。docker log dirver 亦或 logspout 只能处理 stdout，log-pilot 不仅支持收集 stdout 日志，还可以收集文件日志。</li>
+<li>声明式配置。当您的容器有日志要收集，只要通过 label 声明要收集的日志文件的路径，无需改动其他任何配置，log-pilot 就会自动收集新容器的日志。</li>
+<li>支持多种日志存储方式。无论是强大的阿里云日志服务，还是比较流行的 elasticsearch 组合，甚至是 graylog，log-pilot 都能把日志投递到正确的地点。</li>
+</ul>
+<h3 id="采集输出到console"><a href="#采集输出到console" class="headerlink" title="采集输出到console"></a>采集输出到console</h3><p>环境准备：一台主机<br>步骤： 先启动一个 log-pilot，再启动一个 tomcat 容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 打开一个终端，启动log-pilot容器（不要关闭终端, 观察控制台日志）</div><div class="line">docker run --name mypilot --rm -it \</div><div class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</div><div class="line">    -v /:/host \</div><div class="line">	--privileged  \</div><div class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</div><div class="line"><span class="meta"></span></div><div class="line"># 打开一个终端，启动tomcat容器</div><div class="line">docker run --name mytomcat -it --rm  -p 10080:8080 \</div><div class="line">-v /usr/local/tomcat/logs \</div><div class="line">--label aliyun.logs.catalina=stdout \</div><div class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt \</div><div class="line">tomcat</div></pre></td></tr></table></figure>
+<p>说明：</p>
+<ul>
+<li><code>aliyun.logs.catalina=stdout</code> 告诉 log-pilot 这个容器要收集 stdout 日志。</li>
+<li><code>aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</code> 则表示要收集容器内 /usr/local/tomcat/logs/ 目录下所有名字匹配 localhost_access_log.*.txt 的文件日志。后面会详细介绍 label 的用法。</li>
+</ul>
+<p>log-pilot 会监控 Docker 容器事件，当发现带有 aliyun.logs.xxx 容器时，自动解析容器配置，并且开始收集对应的日志。启动 tomcat 之后，会发现 log-pilot 的终端立即输出了一大堆的内容，其中包含 tomcat 启动时输出的 stdout 日志，也包括 log-pilot 自己输出的一些调试信息。</p>
+<p>可以打开浏览器访问刚刚部署的 tomcat，您会发现每次刷新浏览器，在 log-pilot 的终端里都能看到类似的记录。其中 message 后面的内容就是从 /usr/local/tomcat/logs/localhost_access_log.XXX.txt 里收集到的日志。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 打开一个终端，进入tomcat容器</div><div class="line">docker exec -it -u root mytomcat /bin/bash</div><div class="line"><span class="meta">#</span> 模拟浏览器访问tomcat</div><div class="line">curl 127.0.0.1:8080</div></pre></td></tr></table></figure>
+<h3 id="采集输出到ES-kibana"><a href="#采集输出到ES-kibana" class="headerlink" title="采集输出到ES+kibana"></a>采集输出到ES+kibana</h3><p>环境准备：一台主机(可以跟上面同一台主机)</p>
+<p>部署ELK</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 先在宿主机上执行如下命令</div><div class="line">sudo sysctl -w vm.max_map_count=262144</div><div class="line"><span class="meta"></span></div><div class="line"># 运行ELK容器</div><div class="line">docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 9300:9300 -it --name elk sebp/elk:630</div><div class="line"><span class="meta"></span></div><div class="line"># 检查</div><div class="line">浏览器访问kibana控制台  http://主机IP:5601</div><div class="line">浏览器访问es  http://主机IP:9200</div></pre></td></tr></table></figure>
+<p>重启log-pilot</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 关闭前面运行的log-pilot</div><div class="line">docker stop mypilot</div><div class="line">docker rm mypilot</div><div class="line"><span class="meta"></span></div><div class="line"># 启动log-pilot，注意替换ES所在的主机IP地址</div><div class="line">docker run --rm -it \</div><div class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</div><div class="line">    -v /:/host \</div><div class="line">    --privileged \</div><div class="line">    -e FLUENTD_OUTPUT=elasticsearch \</div><div class="line">    -e ELASTICSEARCH_HOST=172.17.0.3 \</div><div class="line">    -e ELASTICSEARCH_PORT=9200 \</div><div class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</div></pre></td></tr></table></figure>
+<p>相比前面启动 log-pilot 的方式，这里增加了三个环境变量：</p>
+<ul>
+<li>FLUENTD_OUTPUT=elasticsearch：把日志发送到 ElasticSearch。</li>
+<li>ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}：ElasticSearch 的域名。</li>
+<li>ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}：ElasticSearch 的端口号。</li>
+</ul>
+<p>继续运行前面的 tomcat，再次访问，让 tomcat 产生一些日志，所有这些新产生的日志都将发送到 ElasticSearch 里。</p>
+<p>打开 kibana，此时您还看不到新日志，需要先创建 index。log-pilot 会把日志写到 ElasticSearch 特定的 index下，规则如下：</p>
+<p>如果应用上使用了标签 <code>aliyun.logs.tags</code>，并且 <code>tags</code> 里包含 <code>target</code>，使用 <code>target</code> 作为 ElasticSearch 里的 index。否则，使用标签 <code>aliyun.logs.XXX</code> 里的 <code>XXX</code> 作为 index。</p>
+<p>在前面 tomcat 里的例子里，没有使用 <code>liyun.logs.tags</code> 标签，所以默认使用了 <code>access</code> 和 <code>catalina</code> 作为 index。我们先创建 index <code>access</code>。</p>
+<p><img src="/2018/07/06/docker日志收集方案/kibana-creat-index.png" alt="kibana-creat-index"><br>创建好 index 就可以查看日志了。<br><img src="/2018/07/06/docker日志收集方案/kibana-showlog.png" alt="kibana-creat-index"></p>
+<h3 id="使用编排文件运行log-pilot"><a href="#使用编排文件运行log-pilot" class="headerlink" title="使用编排文件运行log-pilot"></a>使用编排文件运行log-pilot</h3><p>log-pilot docker-compose.yml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"2"</span></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">    pilot:</span></div><div class="line"><span class="attr">      image:</span> <span class="string">registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</span></div><div class="line"><span class="attr">      volumes:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/var/run/docker.sock:/var/run/docker.sock</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/:/host</span></div><div class="line"><span class="attr">    privileged:</span> <span class="literal">true</span></div><div class="line"><span class="attr">    environment:</span></div><div class="line"><span class="attr">      FLUENTD_OUTPUT:</span> <span class="string">elasticsearch</span> <span class="comment">#按照您的需要替换</span></div><div class="line"><span class="attr">      ELASTICSEARCH_HOST:</span> <span class="string">$&#123;elasticsearch&#125;</span> <span class="comment">#按照您的需要替换</span></div><div class="line"><span class="attr">      ELASTICSEARCH_PORT:</span> <span class="number">9200</span></div><div class="line"><span class="attr">      logging:</span></div><div class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></div><div class="line"><span class="attr">        options:</span></div><div class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></div><div class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></div><div class="line"><span class="attr">    cpu_shares:</span> <span class="number">512</span>  <span class="comment">#限制CPU使用份额权重,默认1024</span></div><div class="line"><span class="attr">    mem_limit:</span> <span class="number">600</span><span class="string">m</span>  <span class="comment">#内存限制600M</span></div><div class="line"><span class="attr">    memswap_limit:</span> <span class="number">800</span><span class="string">m</span> <span class="comment">#内存+swap限制800M</span></div><div class="line"><span class="attr">      blkio_config:</span></div><div class="line"><span class="attr">        weight:</span> <span class="number">300</span> <span class="comment">#限制读写磁盘带宽,默认500,取值0-1000</span></div><div class="line"><span class="attr">      networks:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">webnet</span></div><div class="line"></div><div class="line"><span class="attr">networks:</span></div><div class="line"><span class="attr">    webnet:</span></div><div class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></div></pre></td></tr></table></figure>
+<p>查看限制的CPU、内存是否生效：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看CPU</div><div class="line">cat /sys/fs/cgroup/cpu/docker/&lt;容器长ID&gt;/cpu.shares</div><div class="line"><span class="meta"></span></div><div class="line"># 查看内存</div><div class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.limit_in_bytes</div><div class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.memsw.limit_in_bytes</div><div class="line"><span class="meta"></span></div><div class="line"># 或者直接查看容器详细信息</div><div class="line">docker inspect &lt;容器长ID&gt;</div></pre></td></tr></table></figure>
+<p>tomcat docker-compose.yml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"2"</span></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">    mytomcat:</span></div><div class="line"><span class="attr">      image:</span> <span class="attr">tomcat:latest</span></div><div class="line"><span class="attr">      ports:</span></div><div class="line"><span class="bullet">        -</span> <span class="number">8080</span><span class="string">:8080</span></div><div class="line"><span class="attr">      volumes:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">/usr/local/tomcat/logs</span></div><div class="line"><span class="attr">      labels:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.catalina=stdout"</span></div><div class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt"</span></div><div class="line"><span class="attr">      logging:</span></div><div class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></div><div class="line"><span class="attr">        options:</span></div><div class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></div><div class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></div><div class="line"><span class="attr">      networks:</span></div><div class="line"><span class="bullet">        -</span> <span class="string">webnet</span></div><div class="line"></div><div class="line"><span class="attr">networks:</span></div><div class="line"><span class="attr">    webnet:</span></div><div class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></div></pre></td></tr></table></figure>
+<p>运行容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">docker-compose -f mylogpilot.yml up</div><div class="line">docker-compose -f mytomcat.yml up</div></pre></td></tr></table></figure>
+<h3 id="label-说明"><a href="#label-说明" class="headerlink" title="label 说明"></a>label 说明</h3><p>启动 tomcat 时，声明了下面两个 label 来告诉 log-pilot 这个容器的日志位置。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">--label aliyun.logs.catalina=stdout</div><div class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</div></pre></td></tr></table></figure>
+<p>您还可以在应用容器上添加更多的标签。</p>
+<ul>
+<li><code>aliyun.logs.$name = $path</code><ul>
+<li>变量 <code>name</code> 是日志名称，只能包含 0~9、a~z、A~Z 和连字符（-）。</li>
+<li>变量 <code>path</code> 是要收集的日志路径，必须具体到文件，不能只写目录。文件名部分可以使用通配符，例如，<code>/var/log/he.log</code> 和 <code>/var/log/*.log</code> 都是正确的值，但 <code>/var/log</code> 不行，不能只写到目录。<code>stdout</code> 是一个特殊值，表示标准输出。</li>
+</ul>
+</li>
+<li><code>aliyun.logs.$name.format</code>：日志格式，目前支持以下格式。<ul>
+<li>none：无格式纯文本。</li>
+<li>json：json 格式，每行一个完整的 json 字符串。</li>
+<li>csv：csv 格式。</li>
+</ul>
+</li>
+<li><p><code>aliyun.logs.$name.tags</code>：上报日志时，额外增加的字段，格式为 <code>k1=v1,k2=v2</code>，每个 key-value 之间使用逗号分隔，例如 <code>aliyun.logs.access.tags=&quot;name=hello,stage=test&quot;</code>，上报到存储的日志里就会出现 <code>name</code> 字段和 <code>stage</code> 字段。</p>
+<p>如果使用 ElasticSearch 作为日志存储，<code>target</code> 这个 tag 具有特殊含义，表示 ElasticSearch 里对应的 index。</p>
+</li>
+</ul>
+<h3 id="最后的思考"><a href="#最后的思考" class="headerlink" title="最后的思考"></a>最后的思考</h3><ul>
+<li>采集到重复数据问题，比如采集程序重启之后，读到重复数据，是否有排重？根据什么规则排重？</li>
+<li>采集数据是否会发生遗漏，比如采集程序重启之后，是否有标记最后读取的位置</li>
+<li>采集输出到后端，是否有过滤，或者可以自定义过滤</li>
+<li>采集输出到后端，是否尽量保证不丢失，采用的策略是什么</li>
+</ul>
+<p>如果log-pilot做不到上述事情,或者扩展起来麻烦，则考虑自己写个agent, 起码自己写的程序，知道如何驾驭;</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>log-pilot官方<br><a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="external">https://github.com/AliyunContainerService/log-pilot</a><br><a href="https://helpcdn.aliyun.com/document_detail/50441.html" target="_blank" rel="external">https://helpcdn.aliyun.com/document_detail/50441.html</a>  </li>
+<li>Docker日志收集最佳实践<br><a href="https://yq.aliyun.com/articles/72700" target="_blank" rel="external">https://yq.aliyun.com/articles/72700</a></li>
+<li>logspout<br><a href="https://github.com/gliderlabs/logspout" target="_blank" rel="external">https://github.com/gliderlabs/logspout</a></li>
+<li>logspout 网友扩展<br><a href="https://www.jianshu.com/p/bd482c13ea66" target="_blank" rel="external">https://www.jianshu.com/p/bd482c13ea66</a></li>
+</ul>
+<h1 id="几种采集架构图"><a href="#几种采集架构图" class="headerlink" title="几种采集架构图"></a>几种采集架构图</h1><ul>
+<li><p>业务埋点数据、应用日志数据<br>log-pilot-&gt;kafka-&gt;logstash-&gt;es-&gt;kibana<br>log-pilot-&gt;kafka-&gt;storm/spark<br><img src="/2018/07/06/docker日志收集方案/flow1.png" alt="flow1"></p>
+</li>
+<li><p>应用日志数据<br>log-pilot-&gt;logstash-&gt;es-&gt;kibana<br><img src="/2018/07/06/docker日志收集方案/flow2.png" alt="flow2"></p>
+</li>
+<li><p>采集文件日志<br>采集工具可以用log-pilot、filebeat、fluentd、flume、….<br><img src="/2018/07/06/docker日志收集方案/flow3.png" alt="flow3"></p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2018/07/06/docker save-load and export-import/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/06/docker save-load and export-import/" itemprop="url">docker save-load and export-import</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T16:12:00+08:00">
+                2018-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/容器/" itemprop="url" rel="index">
+                    <span itemprop="name">容器</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="docker-镜像导入导出"><a href="#docker-镜像导入导出" class="headerlink" title="docker 镜像导入导出"></a>docker 镜像导入导出</h1><p>两组导入导出命令：  </p>
+<ul>
+<li>docker save/load</li>
+<li>docker export/import</li>
+</ul>
+<p>两种使用场景(两者可以结合使用)： </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>save/load</td>
+<td>如果部署的节点服务器不能连外部或者内部镜像仓库，则可以docker save镜像打包，然后拷贝上传到要部署的节点服务其上，使用docker load载入</td>
+</tr>
+<tr>
+<td>export/import</td>
+<td>用于制作基础镜像，比如容器启动后，在容器中安装一些软件或者环境的设置，使用docker export导出修改后的容器，然后分发给其他人使用(比如作为基础的开发环境)</td>
+</tr>
+</tbody>
+</table>
+<p>也可以使用docker commit命令，提交修改后的容器，并上传至镜像仓库;<br>注意：用docker commit命令打包的镜像，比Dockerfile方式打出的镜像大(镜像分层问题)</p>
+<h1 id="测试环境准备"><a href="#测试环境准备" class="headerlink" title="测试环境准备"></a>测试环境准备</h1><p>步骤：</p>
+<ul>
+<li>构建一个centos镜像</li>
+<li>进入容器安装软件</li>
+<li>配置防火墙</li>
+<li>提交容器修改</li>
+</ul>
+<p>构建镜像、运行容器、进入容器后台</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone https://github.com/smalldok/docker-based-tools.git</div><div class="line"><span class="meta">$</span> cd dind_centos</div><div class="line"><span class="meta">$</span> docker build -t dind_centos .</div><div class="line"><span class="meta">$</span> docker run --name docker-0 --privileged -d dind_centos</div><div class="line"><span class="meta">$</span> docker exec -it -u root docker-0 /bin/bash</div></pre></td></tr></table></figure>
+<p>安装软件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 安装支持ifconfig命令的工具</div><div class="line">yum install net-tools</div><div class="line"><span class="meta"></span></div><div class="line"># 安装firewalld</div><div class="line">yum install firewalld firewall-config</div><div class="line">systemctl start  firewalld # 启动</div></pre></td></tr></table></figure>
+<p>开放docker-swarm需要的端口</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 开放防火墙端口</div><div class="line">firewall-cmd --permanent --add-port=2377/tcp</div><div class="line">firewall-cmd --permanent --add-port=7946/tcp</div><div class="line">firewall-cmd --permanent --add-port=7946/udp</div><div class="line">firewall-cmd --permanent --add-port=4789/udp</div><div class="line">firewall-cmd --reload # 永久打开端口需要reload一下</div><div class="line">firewall-cmd --list-all # 查看防火墙，添加的端口也可以看到</div></pre></td></tr></table></figure>
+<h1 id="docker-export-import"><a href="#docker-export-import" class="headerlink" title="docker export/import"></a>docker export/import</h1><ul>
+<li>docker export<br>docker export是将container的文件系统打包; </li>
+<li>docker import<br>docker import将container导入后成为一个Image,而不是恢复为一个container;<br>可指定image[:tag]，为镜像指定新名称；如果名称相同，则会覆盖老的镜像；</li>
+</ul>
+<p><code>docker export 导出容器</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> docker ps</div><div class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                        NAMES</div><div class="line">1eb256b1d4b1        dind_centos         "wrapdocker /usr/sbi…"   About an hour ago   Up About an hour       docker-0</div><div class="line"><span class="meta"></span></div><div class="line">$ docker export 1eb256b1d4b1 &gt; dind_centos.tar</div></pre></td></tr></table></figure>
+<p><code>docker import 导入</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> docker import dind_centos.tar dind_centos:1.0</div><div class="line">sha256:4e8612dad5ba4230e618a424727a679e0f52f7a1fcfb16bbfe5626338784d404</div><div class="line"><span class="meta"></span></div><div class="line">$ docker images</div><div class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</div><div class="line">dind_centos         1.0                 4e8612dad5ba        20 seconds ago      539MB</div><div class="line">dind_centos         latest              9031f35e0ec5        4 days ago          550MB</div><div class="line">centos              latest              49f7960eb7e4        3 weeks ago         200MB</div></pre></td></tr></table></figure>
+<p><code>查看之前对容器的修改是否还在</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 运行容器</div><div class="line"><span class="meta">$</span> docker run --name docker-test --privileged -d dind_centos:1.0 wrapdocker /usr/sbin/init</div><div class="line">960ecfc2f531533ba36c3cefb00fa9f784cdafd14a898577c52262f03d3faede</div><div class="line"><span class="meta"></span></div><div class="line"># 查看ifconfig是否生效</div><div class="line"><span class="meta">$</span> ifconfig</div></pre></td></tr></table></figure>
+<h1 id="docker-save-load"><a href="#docker-save-load" class="headerlink" title="docker save/load"></a>docker save/load</h1><ul>
+<li><p>docker save<br>docker save 可以对image或者container打包；对container打包，其实打的是容器背后的image;<br>docker save 可以用来将一个或者多个Image打包，如： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 打包之后的test.tar包含nginx:1.0 httpd:1.4这两个镜像</div><div class="line">docker save -o test.tar nginx:1.0 httpd:1.4</div></pre></td></tr></table></figure>
+</li>
+<li><p>docker load  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 该命令会把nginx:1.0 httpd:1.4载入进来，如果本地已经存在这两个镜像，会被覆盖</div><div class="line">docker load -i test.tar</div></pre></td></tr></table></figure>
+</li>
+</ul>
 
           
         
@@ -2278,142 +2431,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2017/06/30/IaaS-PaaS-SaaS区别/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="smalldok">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Smalldok's Tech Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/30/IaaS-PaaS-SaaS区别/" itemprop="url">IaaS-PaaS-SaaS区别</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-30T10:12:56+08:00">
-                2017-06-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/其他/" itemprop="url" rel="index">
-                    <span itemprop="name">其他</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Infrastructure（基础设施）-as-a- Service，<br>Platform（平台）-as-a-Service，<br>Software（软件）-as-a-Service。<br>基础设施在最下端，平台在 中间，软件在顶端;</p>
-<p>如果你是一个网站站长，想要建立一个网站。不采用云服务，你所需要的投入大概是：买服务器，安装服务器软件，编写网站程序。现在你追随潮流，采用流行的云计算，如果你采用IaaS服务，那么意味着你就不用自己买服务器了，随便在哪家购买虚拟机，但是还是需要自己装服务器软件而如果你采用PaaS的服务，那么意味着你既不需要买服务器，也不需要自己装服务器软件，只需要自己开发网站程序如果你再进一步，购买某些在线论坛或者在线网店的服务,这意味着你也不用自己开发网站程序，只需要使用它们开发好的程序，而且他们会负责程序的升级、维护、增加服务器等，而你只需要专心运营即可，此即为SaaS。</p>
-<p>IaaS：阿里云 亚马逊云 腾讯云<br>PaaS：新浪云 百度云</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2463,7 +2480,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
