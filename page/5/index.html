@@ -1,0 +1,987 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="JAVA服务端架构，目前方向是微服务落地、DevOps，且持续关注service mesh">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Smalldok&#39;s Tech Blog">
+<meta property="og:url" content="https://smalldok.github.io/page/5/index.html">
+<meta property="og:site_name" content="Smalldok&#39;s Tech Blog">
+<meta property="og:description" content="JAVA服务端架构，目前方向是微服务落地、DevOps，且持续关注service mesh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Smalldok&#39;s Tech Blog">
+<meta name="twitter:description" content="JAVA服务端架构，目前方向是微服务落地、DevOps，且持续关注service mesh">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://smalldok.github.io/page/5/"/>
+
+
+
+
+
+  <title>Smalldok's Tech Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6cc27890b716ee2ca5deb7aa76a254f3";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Smalldok's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">互联网基础设施</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+  <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2017/08/04/前端开发工具之vscode安装配置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/04/前端开发工具之vscode安装配置/" itemprop="url">前端开发工具之vscode安装配置</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-04T17:22:00+08:00">
+                2017-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前端的一些开发工具"><a href="#前端的一些开发工具" class="headerlink" title="前端的一些开发工具"></a>前端的一些开发工具</h2><p><code>vscode</code> <code>atom</code> <code>sublime text</code> <code>webstorm</code></p>
+<h2 id="mac-vscode-安装"><a href="#mac-vscode-安装" class="headerlink" title="mac vscode 安装"></a>mac vscode 安装</h2><p>官网下载安装即可，略….<br><code>我安装后的效果</code><br><img src="/2017/08/04/前端开发工具之vscode安装配置/vscode.png" alt="vscode">  </p>
+<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><ul>
+<li><p><code>vscode-icon</code><br>项目工程文件加上漂亮图标，方便识别，必备良品！  </p>
+</li>
+<li><p><code>Debugger for Chrome</code><br>映射 chrome 的 debug功能，静态页面都可以用 vscode 来打断点调试</p>
+</li>
+<li><p><code>vscode-fileheader</code><br>添加头部注释：作者、创建时间、最新修改时间;<br>1、设置头注释，打开<code>.vscode/settings.json</code>，查找<code>fileheader</code><br>2、插入头注释快捷键ctrl+alt+i</p>
+</li>
+<li><p><code>beautify</code><br>格式化html，css，js</p>
+</li>
+<li><code>HTML Snippets</code><br>可以在不输入 &lt; 的情况下提示</li>
+<li><code>Git History</code><br>显示git log和line history</li>
+</ul>
+<p>更多插件参考：<br><a href="https://segmentfault.com/a/1190000006697219" target="_blank" rel="external">vscode 插件推荐 - 献给所有前端工程师</a></p>
+<p><a href="http://www.cnblogs.com/xwwin/p/6247765.html" target="_blank" rel="external">http://www.cnblogs.com/xwwin/p/6247765.html</a></p>
+<h2 id="vscode-配置备份"><a href="#vscode-配置备份" class="headerlink" title="vscode 配置备份"></a>vscode 配置备份</h2><p>这么多配置，不备份怎么行</p>
+<blockquote>
+<p><code>方式一：备份到github gist</code>  </p>
+<ul>
+<li>github 上生成token，然后复制token  </li>
+<li>上传备份<br>vscode中按shift+alt +u  在弹出窗里输入你的token，然后会生成syncSummary.txt文件在窗口中打开；  </li>
+<li>下载备份<br>打开syncSummary.txt文件，找到<code>sync.gist</code>值；<br>vscode中按shift+alt +d，在弹出窗里输入这个值；   </li>
+<li>参考文章：<br><a href="http://www.cnblogs.com/ashidamana/p/6761085.html" target="_blank" rel="external">vscode同步设置&amp;扩展插件</a></li>
+</ul>
+<p><code>方式二：备份github或者git oschina(分支形式)</code>  </p>
+<ul>
+<li>在github或者git oschina创建一个项目<br><a href="https://xxxx/smalldok/mybackup.git" target="_blank" rel="external">https://xxxx/smalldok/mybackup.git</a>  </li>
+<li>命令行，进入vscode安装目录  </li>
+<li>备份<br>git init<br>git add .<br>git commit -m “xxxxxxx”<br>git checkout -b mac-vscode1.14.2<br>git remote add origin <a href="https://xxxx/smalldok/mybackup.git" target="_blank" rel="external">https://xxxx/smalldok/mybackup.git</a><br>git push origin mac-vscode1.14.2</li>
+<li>恢复<br>git pull –rebase origin mac-vscode1.14.2</li>
+</ul>
+</blockquote>
+<p><strong><code>方式二</code>也是我自己备份电脑上各种配置的做法</strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/2017/07/17/jenkins-springboot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/17/jenkins-springboot/" itemprop="url">jenkins+springboot</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-17T10:12:37+08:00">
+                2017-07-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jenkins/" itemprop="url" rel="index">
+                    <span itemprop="name">jenkins</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1、环境<br>2、jenkins服务器与部署服务器SSH打通<br>3、jenkins配置<br>4、部署服务器配置</p>
+<p>附：服务端小组协作流程图</p>
+<h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><table>
+<thead>
+<tr>
+<th>服务器</th>
+<th>安装</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jenkins服务器</td>
+<td>jenkins2.60.1</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>jdk1.8</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>git2.1.4</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>maven3</td>
+<td>-</td>
+</tr>
+<tr>
+<td>部署服务器</td>
+<td>centos6.6</td>
+<td>7有BUG</td>
+</tr>
+<tr>
+<td>-</td>
+<td>jdk1.8</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>openssh-server</td>
+<td>-</td>
+</tr>
+<tr>
+<td>github项目例子</td>
+<td><a href="https://github.com/smalldok/springboot-jenkins" target="_blank" rel="external">https://github.com/smalldok/springboot-jenkins</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h1 id="jenkins服务器与部署服务器SSH打通"><a href="#jenkins服务器与部署服务器SSH打通" class="headerlink" title="jenkins服务器与部署服务器SSH打通"></a>jenkins服务器与部署服务器SSH打通</h1><p>主要是jenkins中可以远程执行部署服务器的SHELL脚本；  </p>
+<p><code>部署服务器</code> 启动SSH服务<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">rpm -qa |grep ssh #检查是否装了SSH包</div><div class="line"><span class="meta">#</span><span class="bash">没有的话yum install openssh-server</span></div><div class="line">chkconfig --list sshd #检查SSHD是否在本运行级别下设置为开机启动</div><div class="line">chkconfig --level 2345 sshd on  #如果没设置启动就设置下.</div><div class="line">service sshd restart  #重新启动</div><div class="line">netstat -antp |grep sshd  #看是否启动了22端口.确认下.</div><div class="line">iptables -nL  #看看是否放行了22口.</div></pre></td></tr></table></figure></p>
+<p><code>jenkins服务器</code> 测试远程执行SHELL<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash">jenkins服务器上生产RSA公钥私钥对</span></div><div class="line"><span class="meta">#</span><span class="bash">jenkens_home目录中的.ssh目录中运行命令</span></div><div class="line">ssh-keygen -t rsa  #一直回车</div><div class="line">ssh-copy-id -i smalldok@172.17.0.2 #传输公钥给需要访问的服务器</div><div class="line"><span class="meta"></span></div><div class="line">#<span class="bash">jenkins服务器上测试：</span></div><div class="line">ssh smalldok@172.17.0.2 "/home/smalldok/test.sh"</div></pre></td></tr></table></figure></p>
+<p><code>test.sh</code><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash">!/bin/sh</span></div><div class="line">echo "&gt;&gt;&gt;&gt;&gt;&gt;&gt;"</div></pre></td></tr></table></figure></p>
+<h1 id="jenkins-配置"><a href="#jenkins-配置" class="headerlink" title="jenkins 配置"></a>jenkins 配置</h1><h3 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h3><p><code>jenkins 系统管理-&gt;插件管理</code><br>安装maven-intestrating-plugin(新建maven构建项目用)；<br>安装Role-based Authorization Strategy(用户角色权限设置)；  </p>
+<h3 id="jdk-git-maven设置"><a href="#jdk-git-maven设置" class="headerlink" title="jdk/git/maven设置"></a>jdk/git/maven设置</h3><p><code>jenkins 系统管理-&gt;Global Tool Configuration</code><br>分别设置jdk、git、maven</p>
+<h3 id="项目构建配置"><a href="#项目构建配置" class="headerlink" title="项目构建配置"></a>项目构建配置</h3><p>见<a href="https://github.com/smalldok/springboot-jenkins.git" target="_blank" rel="external">https://github.com/smalldok/springboot-jenkins.git</a></p>
+<h3 id="创建用户、分配权限、视图"><a href="#创建用户、分配权限、视图" class="headerlink" title="创建用户、分配权限、视图"></a>创建用户、分配权限、视图</h3><p>jenkins权限管理，实现不同用户组显示对应视图views中不同的jobs ；<br>场景：<br>隔离开发环境、测试环境、生产环境；<br>开发人员构建开发环境的项目；<br>测试人员构建测试环境的项目；<br>运维人员构建生产环境的项目；  </p>
+<p><code>视图</code>  </p>
+<table>
+<thead>
+<tr>
+<th>All</th>
+<th>dev-A项目</th>
+<th>dev-B项目</th>
+<th>test-B项目</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-</td>
+<td>dev-MyDemo</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>-</td>
+<td>dev-xxServer</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>test-xxServer</td>
+</tr>
+</tbody>
+</table>
+<p>即：<br>开发人员登录jenkins只能看到dev-A项目、dev-B项目视图；<br>测试人员登录jenkins只能看到test-B项目视图；</p>
+<p><code>admin All视图</code><br><img src="/2017/07/17/jenkins-springboot/admin All视图.png" alt="adminAll视图"><br><code>dev-A项目视图</code><br>这个视图下，存放A项目的开发构建环境<br><img src="/2017/07/17/jenkins-springboot/dev-A项目视图.png" alt="dev-A项目视图"><br><code>dev-B项目视图</code><br>这个视图下，存放B项目的开发构建环境<br><img src="/2017/07/17/jenkins-springboot/dev-B项目视图.png" alt="dev-B项目视图"><br><code>test-B项目视图</code><br>这个视图下，存放B项目的测试构建环境<br><img src="/2017/07/17/jenkins-springboot/test-B项目视图.png" alt="test-B项目视图">  </p>
+<p><code>分别创建如上三个视图</code><br>把项目加入到相关的视图中；<br>开发的项目前缀，以dev-开头；<br>开发的项目前缀，以test-开头；  </p>
+<p><code>创建用户（乔治、佩奇）</code><br><img src="/2017/07/17/jenkins-springboot/创建用户.png" alt="创建用户"></p>
+<p><code>jenkins 系统管理-&gt;Manage and Assign Roles-&gt;Manage Roles</code><br><img src="/2017/07/17/jenkins-springboot/角色权限配置1.png" alt="角色权限配置1"><br><code>jenkins 系统管理-&gt;Manage and Assign Roles-&gt;Assign Roles</code><br><img src="/2017/07/17/jenkins-springboot/角色权限配置2.png" alt="角色权限配置2"></p>
+<p><code>佩奇登录jenkins的效果</code><br><img src="/2017/07/17/jenkins-springboot/佩奇视图.png" alt="佩奇视图"><br><code>乔治登录jenkins的效果</code><br><img src="/2017/07/17/jenkins-springboot/乔治视图.png" alt="乔治视图"></p>
+<p>参考：<a href="http://blog.sina.com.cn/s/blog_8d8f99440101hpzb.html" target="_blank" rel="external">http://blog.sina.com.cn/s/blog_8d8f99440101hpzb.html</a></p>
+<h3 id="配置备份"><a href="#配置备份" class="headerlink" title="配置备份"></a>配置备份</h3><p>配置目录（jenkins_home）加入git版本库</p>
+<h1 id="部署服务器配置"><a href="#部署服务器配置" class="headerlink" title="部署服务器配置"></a>部署服务器配置</h1><p>目标服务器上，提前建好几个目录<br>/home/smalldok/build<br>/home/smalldok/backcup<br>/home/smalldok/release</p>
+<p>还需要一个deploy的shell<br>见-&gt; <a href="https://github.com/smalldok/springboot-jenkins.git" target="_blank" rel="external">https://github.com/smalldok/springboot-jenkins.git</a></p>
+<h1 id="服务端小组协作流程图"><a href="#服务端小组协作流程图" class="headerlink" title="服务端小组协作流程图"></a>服务端小组协作流程图</h1><p><img src="/2017/07/17/jenkins-springboot/服务端小组协作流程图.png" alt="服务端小组协作流程图"></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+  </section>
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar1.jpg"
+               alt="smalldok" />
+          <p class="site-author-name" itemprop="name">smalldok</p>
+           
+              <p class="site-description motion-element" itemprop="description">JAVA服务端架构，目前方向是微服务落地、DevOps，且持续关注service mesh</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/smalldok" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">smalldok</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
