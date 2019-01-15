@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/MPNS/MPNS发送消息流程/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶-加解密/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/MPNS/MPNS发送消息流程/" class="post-title-link" itemprop="url">MPNS发送消息流程</a>
+                <a href="/源码学习/MPush/架构分析/深度进阶-加解密/" class="post-title-link" itemprop="url">深度进阶-加解密</a>
               
             
           </h1>
@@ -472,14 +472,7 @@
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/" itemprop="url" rel="index"><span itemprop="name">源码分析</span></a></span>
-
-                
-                
-                  ，
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/MPNS/" itemprop="url" rel="index"><span itemprop="name">MPNS</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/架构分析/" itemprop="url" rel="index"><span itemprop="name">架构分析</span></a></span>
 
                 
                 
@@ -494,8 +487,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/MPNS/MPNS发送消息流程/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/MPNS/MPNS发送消息流程/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/架构分析/深度进阶-加解密/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/深度进阶-加解密/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -503,7 +496,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/MPNS/MPNS发送消息流程/" class="leancloud_visitors" data-flag-title="MPNS发送消息流程">
+             <span id="/源码学习/MPush/架构分析/深度进阶-加解密/" class="leancloud_visitors" data-flag-title="深度进阶-加解密">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -536,14 +529,41 @@
       
         
           
-            
-
-	<div class="row">
-    <embed src="MPNS发送消息流程.pdf" width="100%" height="550" type="application/pdf">
-	</div>
-
-
- 
+            <p>深度进阶-加解密<br>1、数据交换过程<br>2、RSA 加密解密<br>3、AES 加密解密<br>4、客户端-服务端-MPNS加密交互<br>5、客户端-服务端-握手交互</p>
+<h1 id="数据交换过程"><a href="#数据交换过程" class="headerlink" title="数据交换过程"></a>数据交换过程</h1><h2 id="Mpush方案"><a href="#Mpush方案" class="headerlink" title="Mpush方案"></a>Mpush方案</h2><p>1、算法上同时使用了非对称加密算法(RSA)和对称加密算法(AES)。<br>2、在客户端预埋好由服务端生成好的公钥。<br>3、客户端生成随机数R1，并通过RSA公钥加密后发送给服务端。<br>4、服务端用RSA私钥解密客户端发送的数据取得R1,同时生成随机数R2,并以R1为Key使用AES加密R2然后把加密后的数据发送到客户端。<br>5、客户端以R1为Key使用AES解密服务发送的数据取得R2<br>6、此时客户端和服务的同时都拥有随机数R1、R2，然后使用相同的混淆算法生成会话密钥(sessionKey), 之后传输的数据都以此值作为AES加密的密钥。<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/数据交换-mpush.png" alt="数据交换-mpush"><br>参考：<a href="http://mpush.mydoc.io/?t=134350" target="_blank" rel="noopener">http://mpush.mydoc.io/?t=134350</a>  密钥交换章节</p>
+<h2 id="其他方案"><a href="#其他方案" class="headerlink" title="其他方案"></a>其他方案</h2><p>针对日志的加密方案，我们充分考虑了对称加密和非对称加密各自的优缺点：对称加密加密与解密使用的是同样的密钥，所以速度快，但由于需要将密钥在网络传输，所以安全性不高；非对称加密使用了一对密钥，公钥与私钥，所以安全性高，但加密与解密速度慢。虽然非对称加密很安全，但是和对称加密比起来，它非常的慢，所以还是要用对称加密来传送报文，但对称加密所使用的密钥可以通过非对称加密的方式发送出去。流程如下：  </p>
+<ul>
+<li>APP 端首先生成了一个随机数作为对称密钥。  </li>
+<li>APP 端向服务端请求公钥。  </li>
+<li>服务端将带版本号的公钥发送给 APP 端。  </li>
+<li>APP 端使用该版本的公钥将自己的对称密钥加密。  </li>
+<li>APP 端将加密后的对称密钥（带上公钥版本号）发送给服务端。  </li>
+<li>服务端使用对应版本号的私钥解密得到 APP 端的对称密钥。  </li>
+<li>APP 端与服务端可以使用对称密钥来对沟通的内容进行加密与解密了。  </li>
+</ul>
+<p>参考：<a href="https://mp.weixin.qq.com/s/iUwqQxx87qQeRecjGxwTtg" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/iUwqQxx87qQeRecjGxwTtg</a>  《苏宁用户行为采集体系的演变》</p>
+<h1 id="RSA-加密解密"><a href="#RSA-加密解密" class="headerlink" title="RSA 加密解密"></a>RSA 加密解密</h1><p>mpush工程 -&gt; mpush-tools模块<br>RSAUtilsTest.java<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/RSA加密解密-01.png" alt="RSA加密解密-01"></p>
+<p>mpush工程 -&gt; mpush-test模块<br>RsaTest.java<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/RSA加密解密-02.png" alt="RSA加密解密-02"></p>
+<h1 id="AES-加密解密"><a href="#AES-加密解密" class="headerlink" title="AES 加密解密"></a>AES 加密解密</h1><p>mpush工程 -&gt; mpush-tools模块<br>AESUtilsTest.java<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/AES加密解密-01.png" alt="AES加密解密-01"></p>
+<h1 id="客户端-服务端-MPNS加密交互"><a href="#客户端-服务端-MPNS加密交互" class="headerlink" title="客户端-服务端-MPNS加密交互"></a>客户端-服务端-MPNS加密交互</h1><p>1、客户端向服务端下发消息，会加密；<br>（参考工程mpush-client-java的MPushClient类）<br>2、服务端向客户端返回消息，不会加密；<br>（参考mpush工程，mpush-client模块的ConnClientChannelHandler）<br>（参考mpush工程，mpush-core模块的ConnectionServer中各个<em>*</em>handler#handle方法）<br>3、MPNS向服务端下发消息，会加密；<br>4、服务端向MPNS返回消息，不会加密；<br>5、服务端向客户端转发MPNS的消息，会加密；  </p>
+<p><code>总结：请求消息加密，响应消息不加密</code><br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-MPNS加密交互.png" alt="客户端-服务端-MPNS加密交互"></p>
+<h1 id="客户端-服务端-握手交互"><a href="#客户端-服务端-握手交互" class="headerlink" title="客户端-服务端-握手交互"></a>客户端-服务端-握手交互</h1><p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互01.png" alt="客户端-服务端-握手交互01">  </p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互02.png" alt="客户端-服务端-握手交互02"><br>服务端生成好RSA公钥私钥，并将公钥串给客户端的开发人员<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互03.png" alt="客户端-服务端-握手交互03"><br>1、客户端生成随机数R1，并通过RSA公钥加密后发送给服务端。<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互04.png" alt="客户端-服务端-握手交互04"><br>消息发送前，会经过编码、然后判断SessionContext中是否设置加解密类，如果设置了加解密类，则对消息体加密；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互05.png" alt="客户端-服务端-握手交互05"><br>2和3、服务端用RSA私钥解密客户端发送的数据取得R1,同时生成随机数R2,并以R1为Key使用AES加密R2然后把加密后的数据发送到客户端。<br>2 取得R1<br>服务端ConnectionServer与客户端建立连接时(channelActive)，会设置SessionContext上下文中的加解密类为RSA；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互06.png" alt="客户端-服务端-握手交互06"></p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互07.png" alt="客户端-服务端-握手交互07"><br>服务端ConnectionServer接收到客户端的握手消息，找到HandshakeHandler处理类，然后调用其父类中BaseMessageHandler#handle()方法<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互08.png" alt="客户端-服务端-握手交互08"></p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互09.png" alt="客户端-服务端-握手交互09"><br>上面t.decodeBody()方法，是调用其父类BaseMessage#decodeBody方法；<br>然后decodeBody方法会调用到decodeBinaryBody0方法，进行解码操作；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互10.png" alt="客户端-服务端-握手交互10"><br>解密、解压之后，开始解码得到客户端传过来的R1<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互11.png" alt="客户端-服务端-握手交互11"><br>3 生成随机数R2,并以R1为Key使用AES加密R2然后把加密后的数据发送到客户端。<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互12.png" alt="客户端-服务端-握手交互12"></p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互13.png" alt="客户端-服务端-握手交互13"><br>4、客户端以R1为Key使用AES解密服务端发送的数据，取得R2<br>5、此时客户端和服务的同时都拥有随机数R1、R2，然后使用相同的混淆算法生成会话密钥(sessionKey), 之后传输的数据都以此值作为AES加密的密钥。<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互14.png" alt="客户端-服务端-握手交互14"><br>6、绑定用户请求的消息体(BindUserMessage)用AES加密，密钥为客户端生成的sessionKey<br>如上图所示，在调用binUser(clientConfig)前，已经设置上下文中加解密类为AES，且密钥为sessionKey;<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互15.png" alt="客户端-服务端-握手交互15"><br>先对消息进行编码，然后压缩、加密消息体<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互16.png" alt="客户端-服务端-握手交互16"></p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互17.png" alt="客户端-服务端-握手交互17"></p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互18.png" alt="客户端-服务端-握手交互18"></p>
+<p>7、服务端接收到消息，用服务端生成的sessionKey解密消息体<br>在服务端处理握手响应时(HandshakeHandler#handle)，已将sessionKey作为密钥的AES实例设置到conn中的sessionContext中；</p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互19.png" alt="客户端-服务端-握手交互19"></p>
+<p>故，服务端处理后续的绑定用户请求时，session中的加解密器key是sessionKey，所以在最后decode解码时会拿到sessionKey作为密钥的AES实例，然后进行解密；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互20.png" alt="客户端-服务端-握手交互20"></p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互21.png" alt="客户端-服务端-握手交互21"></p>
+<p>8、绑定用户请求的响应消息体(OkMessage)用AES加密，使用SessionContext中的sessionKey作为密钥的AES实例加密;<br>此步骤有错误，返回给客户端的消息体(OkMessage)，并没有加密；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互22.png" alt="客户端-服务端-握手交互22"></p>
+<p>貌似OKMessage消息没有经过加密，直接是编码然后返回给客户端了；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互23.png" alt="客户端-服务端-握手交互23"></p>
+<p>ConnectServer接收客户端PUSH时，返回给客户端的AckMessage消息也是没有经过加密；<br>没有加密的消息，还有ErrorMessage、FastConnectOkMessage、HttpResponseMessage；  </p>
+<p>GatewayServer接收MPNS的PUSH时，然后转给客户端的PushMessage消息会加密；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互24.png" alt="客户端-服务端-握手交互24"></p>
+<p>GatewayServer返回给MPNS的ErrorMessage、OKMessage消息没有经过加密；<br><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互25.png" alt="客户端-服务端-握手交互25"></p>
+<p><img src="/源码学习/MPush/架构分析/深度进阶-加解密/客户端-服务端-握手交互26.png" alt="客户端-服务端-握手交互26"></p>
 
           
         
@@ -591,7 +611,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/96/">96</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -636,7 +656,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">96</span>
+                    <span class="site-state-item-count">97</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

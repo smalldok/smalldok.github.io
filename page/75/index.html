@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/SDK/mpush-client-java/4-握手/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/接入服务/1-心跳 HEARTBEAT/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/SDK/mpush-client-java/4-握手/" class="post-title-link" itemprop="url">4-握手</a>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/接入服务/1-心跳 HEARTBEAT/" class="post-title-link" itemprop="url">1-心跳 HEARTBEAT</a>
               
             
           </h1>
@@ -479,14 +479,14 @@
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/SDK/" itemprop="url" rel="index"><span itemprop="name">SDK</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/" itemprop="url" rel="index"><span itemprop="name">Mpush Server</span></a></span>
 
                 
                 
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/SDK/mpush-client-java/" itemprop="url" rel="index"><span itemprop="name">mpush-client-java</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/接入服务/" itemprop="url" rel="index"><span itemprop="name">接入服务</span></a></span>
 
                 
                 
@@ -501,8 +501,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/SDK/mpush-client-java/4-握手/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/SDK/mpush-client-java/4-握手/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/接入服务/1-心跳 HEARTBEAT/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/接入服务/1-心跳 HEARTBEAT/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -510,7 +510,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/SDK/mpush-client-java/4-握手/" class="leancloud_visitors" data-flag-title="4-握手">
+             <span id="/源码学习/MPush/源码分析/Mpush Server/接入服务/1-心跳 HEARTBEAT/" class="leancloud_visitors" data-flag-title="1-心跳 HEARTBEAT">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -543,21 +543,26 @@
       
         
           
-            
-
-	<div class="row">
-    <embed src="4-握手.pdf" width="100%" height="550" type="application/pdf">
-	</div>
-
-
-
-<p><br><br> mpush-client-java文章目录:</p>
+            <p>接收消息，解码协议、解码body内容，<code>站内搜索文章: 编码解码</code></p>
+<p>客户端发送心跳：<br>场景一：  </p>
+<blockquote>
+<p>当与服务端建立连接时(ConnClientChannelHandler#channelActive)，发送握手或者快速连接请求；<br>在接收到握手或者快速连接响应时(ConnClientChannelHandler#channelRead)，发送心跳请求；  </p>
+</blockquote>
+<p>场景二：  </p>
+<blockquote>
+<p>当网络断开时不主动关闭连接，而是尝试发送一次心跳检测，如果能收到响应，说明网络短时间内又恢复了，否则就断开连接，等待网络恢复并重建连接。<br>见mpush-client-java工程 MPushClient#onNetStateChange()方法；</p>
+</blockquote>
+<p>服务端接收处理心跳：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ConnectionServer#init()</span></span><br><span class="line">messageDispatcher.register(Command.HEARTBEAT, HeartBeatHandler::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">HeartBeatHandler</span> <span class="keyword">implements</span> <span class="title">MessageHandler</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(Packet packet, Connection connection)</span> </span>&#123;</span><br><span class="line">        connection.send(packet);<span class="comment">//ping -&gt; pong</span></span><br><span class="line">        Logs.HB.info(<span class="string">"ping -&gt; pong, &#123;&#125;"</span>, connection);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br><br>接入服务文章目录:</p>
 <ul>
-<li><a href="../0-关于">0-关于</a></li>
-<li><a href="../1-启动-建立连接">1-启动-建立连接</a></li>
-<li><a href="../2-读数据">2-读数据</a></li>
-<li><a href="../3-写数据">3-写数据</a></li>
-<li><strong><a href="../4-握手">4-握手</a></strong></li>
+<li><font color="red">1-心跳 HEARTBEAT</font></li>
+<li><a href="../2-握手 HANDSHAKE">2-握手 HANDSHAKE</a></li>
+<li><a href="../3-用户绑定-解绑 BIND-UNBIND">3-用户绑定-解绑 BIND-UNBIND</a></li>
+<li><a href="../4-快速连接 FAST_CONNECT">4-快速连接 FAST_CONNECT</a></li>
+<li><a href="../5-客户端推送 PUSH">5-客户端推送 PUSH</a></li>
+<li><a href="../6-消息确认 ACK">6-消息确认 ACK</a></li>
+<li><a href="../7-HTTP代理 HTTP_PROXY">7-HTTP代理 HTTP_PROXY</a></li>
 </ul>
 
           
@@ -606,7 +611,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/74/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/74/">74</a><span class="page-number current">75</span><a class="page-number" href="/page/76/">76</a><span class="space">&hellip;</span><a class="page-number" href="/page/96/">96</a><a class="extend next" rel="next" href="/page/76/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/74/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/74/">74</a><span class="page-number current">75</span><a class="page-number" href="/page/76/">76</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/76/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -651,7 +656,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">96</span>
+                    <span class="site-state-item-count">97</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

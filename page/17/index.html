@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/系统架构说明/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/模块依赖关系/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/架构分析/系统架构说明/" class="post-title-link" itemprop="url">系统架构说明</a>
+                <a href="/源码学习/MPush/架构分析/模块依赖关系/" class="post-title-link" itemprop="url">模块依赖关系</a>
               
             
           </h1>
@@ -487,8 +487,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/架构分析/系统架构说明/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/系统架构说明/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/架构分析/模块依赖关系/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/模块依赖关系/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -496,7 +496,7 @@
 
           
           
-             <span id="/源码学习/MPush/架构分析/系统架构说明/" class="leancloud_visitors" data-flag-title="系统架构说明">
+             <span id="/源码学习/MPush/架构分析/模块依赖关系/" class="leancloud_visitors" data-flag-title="模块依赖关系">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -529,48 +529,19 @@
       
         
           
-            <p>系统架构说明<br>1、逻辑架构<br>2、服务调用关系<br>3、Mpush server启动模块<br>4、消息传递流程(接入服务/Websocket服务)<br>5、云到端消息推送流程  </p>
-<h1 id="逻辑架构"><a href="#逻辑架构" class="headerlink" title="逻辑架构"></a>逻辑架构</h1><p><img src="/源码学习/MPush/架构分析/系统架构说明/逻辑架构.png" alt="逻辑架构">  </p>
-<p>1、最左侧三大组件分别是日志系统、监控系统、控制台治理服务</p>
+            <p><img src="/源码学习/MPush/架构分析/模块依赖关系/模块依赖关系.png" alt="模块依赖关系">  </p>
 <ul>
-<li>Log System 主要负责业务日志大输出，主要有链接相关日志、推送链路日志、心跳日志、监控日志等</li>
-<li>Monitor 主要用作系统状态监控，可用于系统调优，包括jvm内存，线程，线程池，系统堆栈，垃圾回收情况，内存泄漏情况等。</li>
-<li>AdminServer主要用于在控制台对单台机器进行控制与探查，比如参看连接数量，在线用户数，取消本级ZK注册，关闭服务等</li>
+<li>mpush-client：服务端SDK,主要提供发送Push的接口给其他业务使用，比如MPNS</li>
+<li>mpush-boot：是服务端启动入口模块，主要控制server启动、停止流程</li>
+<li>mpush-api：定义了mpush相关核心接口及协议，还包括对外暴露的SPI接口</li>
+<li>mpush-netty：主要提供netty相关的一些基础类，像NettyServer,NettyClient</li>
+<li>mpush-tools：mpush用到的一些工具类，包括线程池，加密，配置文件解析等等</li>
+<li>mpush-zk：zookeeper的client, 包括path的定义，节点定义，数据监听等</li>
+<li>mpush-cache：redis缓存模块，支持单机模式和3.x集群模式，包括用户路由，上下线消息等</li>
+<li>mpush-common：定义了mpush-client模块和mpush-core模块都会用到的类，主要是消息、路由等</li>
+<li>mpush-core：sever核心模块，包括接入服务，网关服务，路由中心，推送中心等等</li>
+<li>mpush-monitor：服务监控模块主要监控JVM，线程池，JMX，服务状态统计，性能统计等</li>
 </ul>
-<p>2、右侧三个分别是ZK服务，配置中心和安全工具箱</p>
-<ul>
-<li>ZK Client 主要负责注册长链接ip:port,网关ip:port以及监听各个节点变化，同时增加了缓存</li>
-<li>ConfigCenter 是MPUSH Server 配置化的关键，贯穿到各个模块，非常重要</li>
-<li>Sercutity Box 主要实现了RSA加密，DES加密，会话密钥生成及Session复用(用于快速重连)</li>
-</ul>
-<p>3、Core模块分别是长链接服务，网关服务，Packet编解码及分发模块，Message序列化及处理模块</p>
-<ul>
-<li>ConnectServer用于维持和客户端之间的TCP通道，主要负责和客户端交互</li>
-<li>GatewayServer用于处理Mpush Server之间的消息交互比如踢人，发送PUSH</li>
-<li>Packet主要是协议部分的编解码和包的完整性校验，最大长度校验等</li>
-<li>PacketReceiver主要负责消息的分发，分发是根据Command来的</li>
-<li>Connection/ConnectionManager主要负责链接管理，定时检查链接空闲情况，是否读写超时，如果链接断开发出相应的事件给路由中心去处理</li>
-<li>Message部分是整个的业务核心处理了处理消息的序列化，还有压缩、加密等，MessageHandler会根据不同消息独立处理自己所属的业务，主要有：心跳响应、握手及密钥交换、快速重连、绑定/解绑用户、http代理、消息推送等</li>
-</ul>
-<p>4、路由中心主要包括：本地路由，远程路由，用户在线管理三大块</p>
-<ul>
-<li>LocalRouterManager负责维护用户＋设备与链接(connection)之间的关系</li>
-<li>RemoteRouterManager负责维护用户＋设备与链接所在机器IP之间的关系</li>
-<li>UserManager主要处理用户上下线事件的广播，以及单台机器的在线用户及数量的维护和查询<br>5、MPUSH的缓存部分，目前只支持Redis,支持双写，主备，hash 等特性</li>
-</ul>
-<p>见其官网说明：<a href="http://mpush.mydoc.io/?t=134339" target="_blank" rel="noopener">http://mpush.mydoc.io/?t=134339</a></p>
-<h1 id="服务依赖关系"><a href="#服务依赖关系" class="headerlink" title="服务依赖关系"></a>服务依赖关系</h1><p><img src="/源码学习/MPush/架构分析/系统架构说明/服务依赖关系.png" alt="服务依赖关系"></p>
-<ul>
-<li>业务系统是要发送业务消息的服务，所有要推送的消息直接转给MPNS</li>
-<li>MPNS是我们的业务推送系统，负责消息推送，长链接的检查，离线消息存储，用户打标等</li>
-<li>APNS、JPUSH、MPUSH等分别是我们的客户端已经接入的推送系统</li>
-<li>MPNS主要是为了隔离业务系统和各种推送系统，用户使用哪个长链接服务，业务系统不需要感知，统一有MPNS去选择、去切换</li>
-<li>Alloc负责调度维护MPushServer集群，提供查询可用机器列表的接口，详细参见[Alloc实现]</li>
-</ul>
-<h1 id="Mpush-server启动模块"><a href="#Mpush-server启动模块" class="headerlink" title="Mpush server启动模块"></a>Mpush server启动模块</h1><p><img src="/源码学习/MPush/架构分析/系统架构说明/Mpush server启动模块.png" alt="Mpush server启动模块"></p>
-<h1 id="消息传递流程-接入服务-Websocket服务"><a href="#消息传递流程-接入服务-Websocket服务" class="headerlink" title="消息传递流程(接入服务/Websocket服务)"></a>消息传递流程(接入服务/Websocket服务)</h1><h2 id="接入服务"><a href="#接入服务" class="headerlink" title="接入服务"></a>接入服务</h2><p><img src="/源码学习/MPush/架构分析/系统架构说明/接入服务.png" alt="接入服务"></p>
-<h2 id="Websocket服务"><a href="#Websocket服务" class="headerlink" title="Websocket服务"></a>Websocket服务</h2><p><img src="/源码学习/MPush/架构分析/系统架构说明/websocket服务.png" alt="Websocket服务"></p>
-<h1 id="云到端消息推送流程"><a href="#云到端消息推送流程" class="headerlink" title="云到端消息推送流程"></a>云到端消息推送流程</h1><p><img src="/源码学习/MPush/架构分析/系统架构说明/云到端消息推送流程.png" alt="云到端消息推送流程"></p>
 
           
         
@@ -618,7 +589,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/96/">96</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -663,7 +634,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">96</span>
+                    <span class="site-state-item-count">97</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

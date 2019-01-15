@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/路由中心/用户路由信息注册/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/服务启动-初始化/3-初始化和启动-2-服务注册与发现模块/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/Mpush Server/路由中心/用户路由信息注册/" class="post-title-link" itemprop="url">用户路由信息注册</a>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/服务启动-初始化/3-初始化和启动-2-服务注册与发现模块/" class="post-title-link" itemprop="url">3-初始化和启动-2-服务注册与发现模块</a>
               
             
           </h1>
@@ -486,7 +486,7 @@
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/路由中心/" itemprop="url" rel="index"><span itemprop="name">路由中心</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/服务启动-初始化/" itemprop="url" rel="index"><span itemprop="name">服务启动-初始化</span></a></span>
 
                 
                 
@@ -501,8 +501,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/Mpush Server/路由中心/用户路由信息注册/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/路由中心/用户路由信息注册/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/服务启动-初始化/3-初始化和启动-2-服务注册与发现模块/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/服务启动-初始化/3-初始化和启动-2-服务注册与发现模块/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -510,7 +510,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/Mpush Server/路由中心/用户路由信息注册/" class="leancloud_visitors" data-flag-title="用户路由信息注册">
+             <span id="/源码学习/MPush/源码分析/Mpush Server/服务启动-初始化/3-初始化和启动-2-服务注册与发现模块/" class="leancloud_visitors" data-flag-title="3-初始化和启动-2-服务注册与发现模块">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -543,9 +543,30 @@
       
         
           
-            <p>BindUserHandler#bind()<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//2.如果握手成功，就把用户链接信息注册到路由中心，本地和远程各一份</span></span><br><span class="line">success = routerCenter.register(message.userId, message.getConnection());</span><br><span class="line"><span class="comment">//3.注册失败再处理下，防止本地注册成功，远程注册失败的情况，只有都成功了才叫成功</span></span><br><span class="line">routerCenter.unRegister(message.userId, context.getClientType());</span><br></pre></td></tr></table></figure></p>
-<p>RouterCenter.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//路由注册（本地、远程）</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">register</span><span class="params">(String userId, Connection connection)</span> </span>&#123;</span><br><span class="line">    ClientLocation location = ClientLocation</span><br><span class="line">            .from(connection)</span><br><span class="line">            .setHost(mPushServer.getGatewayServerNode().getHost())</span><br><span class="line">            .setPort(mPushServer.getGatewayServerNode().getPort());</span><br><span class="line"></span><br><span class="line">    LocalRouter localRouter = <span class="keyword">new</span> LocalRouter(connection);</span><br><span class="line">    RemoteRouter remoteRouter = <span class="keyword">new</span> RemoteRouter(location);</span><br><span class="line"></span><br><span class="line">    LocalRouter oldLocalRouter = <span class="keyword">null</span>;</span><br><span class="line">    RemoteRouter oldRemoteRouter = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        oldLocalRouter = localRouterManager.register(userId, localRouter);</span><br><span class="line">        oldRemoteRouter = remoteRouterManager.register(userId, remoteRouter);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        LOGGER.error(<span class="string">"register router ex, userId=&#123;&#125;, connection=&#123;&#125;"</span>, userId, connection, e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//如果本地路由已经存在，则通过事件，发送踢人消息给客户端，由客户端发出解绑消息unbind</span></span><br><span class="line">    <span class="keyword">if</span> (oldLocalRouter != <span class="keyword">null</span>) &#123;</span><br><span class="line">        EventBus.post(<span class="keyword">new</span> RouterChangeEvent(userId, oldLocalRouter));</span><br><span class="line">        LOGGER.info(<span class="string">"register router success, find old local router=&#123;&#125;, userId=&#123;&#125;"</span>, oldLocalRouter, userId);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//如果远程路由已经存在，并且是在线状态，则通过事件，发送踢人消息给客户端，由客户端发出解绑消息unbind</span></span><br><span class="line">    <span class="keyword">if</span> (oldRemoteRouter != <span class="keyword">null</span> &amp;&amp; oldRemoteRouter.isOnline()) &#123;</span><br><span class="line">        EventBus.post(<span class="keyword">new</span> RouterChangeEvent(userId, oldRemoteRouter));</span><br><span class="line">        LOGGER.info(<span class="string">"register router success, find old remote router=&#123;&#125;, userId=&#123;&#125;"</span>, oldRemoteRouter, userId);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//删除路由（本地路由、远程路由）</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">unRegister</span><span class="params">(String userId, <span class="keyword">int</span> clientType)</span> </span>&#123;</span><br><span class="line">    localRouterManager.unRegister(userId, clientType);</span><br><span class="line">    remoteRouterManager.unRegister(userId, clientType);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>RouterChangeListener.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Subscribe</span></span><br><span class="line"><span class="meta">@AllowConcurrentEvents</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">on</span><span class="params">(RouterChangeEvent event)</span> </span>&#123;</span><br><span class="line">    String userId = event.userId;</span><br><span class="line">    Router&lt;?&gt; r = event.router;</span><br><span class="line">    <span class="keyword">if</span> (r.getRouteType().equals(Router.RouterType.LOCAL)) &#123;</span><br><span class="line">        <span class="comment">//发送踢人消息到客户端</span></span><br><span class="line">        sendKickUserMessage2Client(userId, (LocalRouter) r);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//广播踢人消息到消息中心（MQ）</span></span><br><span class="line">        <span class="comment">//所有机器订阅MQ消息，如果当前机器不是目标机器，直接忽略，</span></span><br><span class="line">        <span class="comment">//否则查询本地路由，找到要被踢下线的链接，发送踢人消息到客户端</span></span><br><span class="line">        sendKickUserMessage2MQ(userId, (RemoteRouter) r);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+            
+
+	<div class="row">
+    <embed src="3-初始化和启动-2-服务注册与发现模块.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+<p><br><br>服务启动-初始化文章目录:</p>
+<ul>
+<li><a href="../1-入口">1-入口</a></li>
+<li><a href="../2-MPushServer初始化">2-MPushServer初始化</a></li>
+<li><a href="../3-初始化和启动-1-缓存模块">3-初始化和启动-1-缓存模块</a></li>
+<li><font color="red">3-初始化和启动-2-服务注册与发现模块</font></li>
+<li><a href="../3-初始化和启动-3-接入服务">3-初始化和启动-3-接入服务</a></li>
+<li><a href="../3-初始化和启动-4-websocket接入服务">3-初始化和启动-4-websocket接入服务</a></li>
+<li><a href="../3-初始化和启动-5-UDP网关服务">3-初始化和启动-5-UDP网关服务</a></li>
+<li><a href="../3-初始化和启动-6-TCP网关服务">3-初始化和启动-6-TCP网关服务</a></li>
+<li><a href="../3-初始化和启动-7-控制台服务">3-初始化和启动-7-控制台服务</a></li>
+<li><a href="../3-初始化和启动-8-路由服务">3-初始化和启动-8-路由服务</a></li>
+<li><a href="../3-初始化和启动-9-推送中心">3-初始化和启动-9-推送中心</a></li>
+<li><a href="../3-初始化和启动-10-HTTP和DNS服务">3-初始化和启动-10-HTTP和DNS服务</a></li>
+<li><a href="../3-初始化和启动-11-监控服务">3-初始化和启动-11-监控服务</a></li>
+</ul>
 
           
         
@@ -593,7 +614,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/60/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/60/">60</a><span class="page-number current">61</span><a class="page-number" href="/page/62/">62</a><span class="space">&hellip;</span><a class="page-number" href="/page/96/">96</a><a class="extend next" rel="next" href="/page/62/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/60/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/60/">60</a><span class="page-number current">61</span><a class="page-number" href="/page/62/">62</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/62/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -638,7 +659,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">96</span>
+                    <span class="site-state-item-count">97</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
