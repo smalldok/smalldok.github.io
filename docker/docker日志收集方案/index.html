@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="docker 日志收集方案容器日志采集：  基于docker api的日志流采集(stdout)； 日志文件采集（log file）  传统应用日志采集：  日志文件采集  工具选型：  支持文件日志和stdout 只支持文件日志 只支持stdout     工具名称 支持文件日志 支持stdout 使用感受     log-pilot yes yes 不错   filebeat yes no 6">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker日志收集方案">
+<meta property="og:url" content="https://smalldok.github.io/docker/docker日志收集方案/index.html">
+<meta property="og:site_name" content="Smalldok&#39;s Tech Blog">
+<meta property="og:description" content="docker 日志收集方案容器日志采集：  基于docker api的日志流采集(stdout)； 日志文件采集（log file）  传统应用日志采集：  日志文件采集  工具选型：  支持文件日志和stdout 只支持文件日志 只支持stdout     工具名称 支持文件日志 支持stdout 使用感受     log-pilot yes yes 不错   filebeat yes no 6">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://smalldok.github.io/docker/docker日志收集方案/kibana-creat-index.png">
+<meta property="og:image" content="https://smalldok.github.io/docker/docker日志收集方案/kibana-showlog.png">
+<meta property="og:image" content="https://smalldok.github.io/docker/docker日志收集方案/flow1.png">
+<meta property="og:image" content="https://smalldok.github.io/docker/docker日志收集方案/flow2.png">
+<meta property="og:image" content="https://smalldok.github.io/docker/docker日志收集方案/flow3.png">
+<meta property="og:updated_time" content="2019-01-12T13:32:48.970Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="docker日志收集方案">
+<meta name="twitter:description" content="docker 日志收集方案容器日志采集：  基于docker api的日志流采集(stdout)； 日志文件采集（log file）  传统应用日志采集：  日志文件采集  工具选型：  支持文件日志和stdout 只支持文件日志 只支持stdout     工具名称 支持文件日志 支持stdout 使用感受     log-pilot yes yes 不错   filebeat yes no 6">
+<meta name="twitter:image" content="https://smalldok.github.io/docker/docker日志收集方案/kibana-creat-index.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://smalldok.github.io/docker/docker日志收集方案/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>docker日志收集方案 | Smalldok's Tech Blog</title>
+  
+
+
+
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6cc27890b716ee2ca5deb7aa76a254f3";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Smalldok's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">穷则变、变则通、通则达</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+  
+  
+
+  
+
+  <a href="https://github.com/smalldok" class="github-corner" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/docker/docker日志收集方案/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="JAVA服务端架构，目前方向是微服务落地、基础设施、中间件、DevOps">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">docker日志收集方案
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/容器/" itemprop="url" rel="index"><span itemprop="name">容器</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/docker/docker日志收集方案/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/docker/docker日志收集方案/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/docker/docker日志收集方案/" class="leancloud_visitors" data-flag-title="docker日志收集方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="docker-日志收集方案"><a href="#docker-日志收集方案" class="headerlink" title="docker 日志收集方案"></a>docker 日志收集方案</h1><p>容器日志采集：</p>
+<ul>
+<li>基于docker api的日志流采集(stdout)；</li>
+<li>日志文件采集（log file）</li>
+</ul>
+<p>传统应用日志采集：</p>
+<ul>
+<li>日志文件采集</li>
+</ul>
+<p>工具选型：</p>
+<ul>
+<li>支持文件日志和stdout</li>
+<li>只支持文件日志</li>
+<li>只支持stdout</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>支持文件日志</th>
+<th>支持stdout</th>
+<th>使用感受</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>log-pilot</td>
+<td>yes</td>
+<td>yes</td>
+<td>不错</td>
+</tr>
+<tr>
+<td>filebeat</td>
+<td>yes</td>
+<td>no</td>
+<td>6.3.0版本总是读不到数据</td>
+</tr>
+<tr>
+<td>logspout</td>
+<td>no</td>
+<td>yes</td>
+<td>他的stdout实现与log-pilot一样,调用的docker api</td>
+</tr>
+<tr>
+<td>docker log dirver</td>
+<td>no</td>
+<td>yes</td>
+<td>dirver支持none/json-file/syslog/fluentd/..</td>
+</tr>
+</tbody>
+</table>
+<p>日志采集工具要点：</p>
+<ul>
+<li>尽量不要影响主机上的应用、占用资源越小越好，不过如果是容器应用的话倒是可以限制其使用的资源；</li>
+<li>是否支持灵活的日志标记，这样可以方便后续归类和数据分析，目前看下来log-pilot还不错；</li>
+</ul>
+<p>案例：</p>
+<ul>
+<li>tomcat既有stdout输出，也有文件日志输出(access.log)，这时你会选择哪个采集工具？</li>
+<li>java应用既有stdout输出(console)，也有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
+<li>xxx应用，只有文件日志输出(xxxx.log)，这时你会选择哪个采集工具？</li>
+</ul>
+<h2 id="log-pilot"><a href="#log-pilot" class="headerlink" title="log-pilot"></a>log-pilot</h2><p>限定容器资源、用docker-compose启动<br>准备环境</p>
+<p>阿里开源：<a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="noopener">https://github.com/AliyunContainerService/log-pilot</a></p>
+<p>log-pilot 具有如下特性：</p>
+<ul>
+<li>一个单独的 log 进程收集机器上所有容器的日志。不需要为每个容器启动一个 log 进程。</li>
+<li>支持文件日志和 stdout。docker log dirver 亦或 logspout 只能处理 stdout，log-pilot 不仅支持收集 stdout 日志，还可以收集文件日志。</li>
+<li>声明式配置。当您的容器有日志要收集，只要通过 label 声明要收集的日志文件的路径，无需改动其他任何配置，log-pilot 就会自动收集新容器的日志。</li>
+<li>支持多种日志存储方式。无论是强大的阿里云日志服务，还是比较流行的 elasticsearch 组合，甚至是 graylog，log-pilot 都能把日志投递到正确的地点。</li>
+</ul>
+<h3 id="采集输出到console"><a href="#采集输出到console" class="headerlink" title="采集输出到console"></a>采集输出到console</h3><p>环境准备：一台主机<br>步骤： 先启动一个 log-pilot，再启动一个 tomcat 容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 打开一个终端，启动<span class="built_in">log</span>-pilot容器（不要关闭终端, 观察控制台日志）</span></span><br><span class="line">docker run --name mypilot --rm -it \</span><br><span class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</span><br><span class="line">    -v /:/host \</span><br><span class="line">	--privileged  \</span><br><span class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 打开一个终端，启动tomcat容器</span></span><br><span class="line">docker run --name mytomcat -it --rm  -p 10080:8080 \</span><br><span class="line">-v /usr/local/tomcat/logs \</span><br><span class="line">--label aliyun.logs.catalina=stdout \</span><br><span class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt \</span><br><span class="line">tomcat</span><br></pre></td></tr></table></figure>
+<p>说明：</p>
+<ul>
+<li><code>aliyun.logs.catalina=stdout</code> 告诉 log-pilot 这个容器要收集 stdout 日志。</li>
+<li><code>aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</code> 则表示要收集容器内 /usr/local/tomcat/logs/ 目录下所有名字匹配 localhost_access_log.*.txt 的文件日志。后面会详细介绍 label 的用法。</li>
+</ul>
+<p>log-pilot 会监控 Docker 容器事件，当发现带有 aliyun.logs.xxx 容器时，自动解析容器配置，并且开始收集对应的日志。启动 tomcat 之后，会发现 log-pilot 的终端立即输出了一大堆的内容，其中包含 tomcat 启动时输出的 stdout 日志，也包括 log-pilot 自己输出的一些调试信息。</p>
+<p>可以打开浏览器访问刚刚部署的 tomcat，您会发现每次刷新浏览器，在 log-pilot 的终端里都能看到类似的记录。其中 message 后面的内容就是从 /usr/local/tomcat/logs/localhost_access_log.XXX.txt 里收集到的日志。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 打开一个终端，进入tomcat容器</span></span><br><span class="line">docker exec -it -u root mytomcat /bin/bash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 模拟浏览器访问tomcat</span></span><br><span class="line">curl 127.0.0.1:8080</span><br></pre></td></tr></table></figure>
+<h3 id="采集输出到ES-kibana"><a href="#采集输出到ES-kibana" class="headerlink" title="采集输出到ES+kibana"></a>采集输出到ES+kibana</h3><p>环境准备：一台主机(可以跟上面同一台主机)</p>
+<p>部署ELK</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 先在宿主机上执行如下命令</span></span><br><span class="line">sudo sysctl -w vm.max_map_count=262144</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 运行ELK容器</span></span><br><span class="line">docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 9300:9300 -it --name elk sebp/elk:630</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 检查</span></span><br><span class="line">浏览器访问kibana控制台  http://主机IP:5601</span><br><span class="line">浏览器访问es  http://主机IP:9200</span><br></pre></td></tr></table></figure>
+<p>重启log-pilot</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 关闭前面运行的<span class="built_in">log</span>-pilot</span></span><br><span class="line">docker stop mypilot</span><br><span class="line">docker rm mypilot</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动<span class="built_in">log</span>-pilot，注意替换ES所在的主机IP地址</span></span><br><span class="line">docker run --rm -it \</span><br><span class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</span><br><span class="line">    -v /:/host \</span><br><span class="line">    --privileged \</span><br><span class="line">    -e FLUENTD_OUTPUT=elasticsearch \</span><br><span class="line">    -e ELASTICSEARCH_HOST=172.17.0.3 \</span><br><span class="line">    -e ELASTICSEARCH_PORT=9200 \</span><br><span class="line">    registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</span><br></pre></td></tr></table></figure>
+<p>相比前面启动 log-pilot 的方式，这里增加了三个环境变量：</p>
+<ul>
+<li>FLUENTD_OUTPUT=elasticsearch：把日志发送到 ElasticSearch。</li>
+<li>ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}：ElasticSearch 的域名。</li>
+<li>ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}：ElasticSearch 的端口号。</li>
+</ul>
+<p>继续运行前面的 tomcat，再次访问，让 tomcat 产生一些日志，所有这些新产生的日志都将发送到 ElasticSearch 里。</p>
+<p>打开 kibana，此时您还看不到新日志，需要先创建 index。log-pilot 会把日志写到 ElasticSearch 特定的 index下，规则如下：</p>
+<p>如果应用上使用了标签 <code>aliyun.logs.tags</code>，并且 <code>tags</code> 里包含 <code>target</code>，使用 <code>target</code> 作为 ElasticSearch 里的 index。否则，使用标签 <code>aliyun.logs.XXX</code> 里的 <code>XXX</code> 作为 index。</p>
+<p>在前面 tomcat 里的例子里，没有使用 <code>liyun.logs.tags</code> 标签，所以默认使用了 <code>access</code> 和 <code>catalina</code> 作为 index。我们先创建 index <code>access</code>。</p>
+<p><img src="/docker/docker日志收集方案/kibana-creat-index.png" alt="kibana-creat-index"><br>创建好 index 就可以查看日志了。<br><img src="/docker/docker日志收集方案/kibana-showlog.png" alt="kibana-creat-index"></p>
+<h3 id="使用编排文件运行log-pilot"><a href="#使用编排文件运行log-pilot" class="headerlink" title="使用编排文件运行log-pilot"></a>使用编排文件运行log-pilot</h3><p>log-pilot docker-compose.yml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">"2"</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">    pilot:</span></span><br><span class="line"><span class="attr">      image:</span> <span class="string">registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">/var/run/docker.sock:/var/run/docker.sock</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">/:/host</span></span><br><span class="line"><span class="attr">    privileged:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      FLUENTD_OUTPUT:</span> <span class="string">elasticsearch</span> <span class="comment">#按照您的需要替换</span></span><br><span class="line"><span class="attr">      ELASTICSEARCH_HOST:</span> <span class="string">$&#123;elasticsearch&#125;</span> <span class="comment">#按照您的需要替换</span></span><br><span class="line"><span class="attr">      ELASTICSEARCH_PORT:</span> <span class="number">9200</span></span><br><span class="line"><span class="attr">      logging:</span></span><br><span class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></span><br><span class="line"><span class="attr">        options:</span></span><br><span class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></span><br><span class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></span><br><span class="line"><span class="attr">    cpu_shares:</span> <span class="number">512</span>  <span class="comment">#限制CPU使用份额权重,默认1024</span></span><br><span class="line"><span class="attr">    mem_limit:</span> <span class="number">600</span><span class="string">m</span>  <span class="comment">#内存限制600M</span></span><br><span class="line"><span class="attr">    memswap_limit:</span> <span class="number">800</span><span class="string">m</span> <span class="comment">#内存+swap限制800M</span></span><br><span class="line"><span class="attr">      blkio_config:</span></span><br><span class="line"><span class="attr">        weight:</span> <span class="number">300</span> <span class="comment">#限制读写磁盘带宽,默认500,取值0-1000</span></span><br><span class="line"><span class="attr">      networks:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">webnet</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line"><span class="attr">    webnet:</span></span><br><span class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+<p>查看限制的CPU、内存是否生效：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看CPU</span></span><br><span class="line">cat /sys/fs/cgroup/cpu/docker/&lt;容器长ID&gt;/cpu.shares</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看内存</span></span><br><span class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.limit_in_bytes</span><br><span class="line">cat /sys/fs/cgroup/memory/docker/&lt;容器长ID&gt;/memory.memsw.limit_in_bytes</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 或者直接查看容器详细信息</span></span><br><span class="line">docker inspect &lt;容器长ID&gt;</span><br></pre></td></tr></table></figure>
+<p>tomcat docker-compose.yml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">"2"</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">    mytomcat:</span></span><br><span class="line"><span class="attr">      image:</span> <span class="attr">tomcat:latest</span></span><br><span class="line"><span class="attr">      ports:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="number">8080</span><span class="string">:8080</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">/usr/local/tomcat/logs</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.catalina=stdout"</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">"aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt"</span></span><br><span class="line"><span class="attr">      logging:</span></span><br><span class="line"><span class="attr">        driver:</span> <span class="string">json-file</span></span><br><span class="line"><span class="attr">        options:</span></span><br><span class="line"><span class="attr">           max-size:</span> <span class="string">"10m"</span></span><br><span class="line"><span class="attr">           max-file:</span> <span class="string">"5"</span></span><br><span class="line"><span class="attr">      networks:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">webnet</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line"><span class="attr">    webnet:</span></span><br><span class="line"><span class="attr">       driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+<p>运行容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker-compose -f mylogpilot.yml up</span><br><span class="line">docker-compose -f mytomcat.yml up</span><br></pre></td></tr></table></figure>
+<h3 id="label-说明"><a href="#label-说明" class="headerlink" title="label 说明"></a>label 说明</h3><p>启动 tomcat 时，声明了下面两个 label 来告诉 log-pilot 这个容器的日志位置。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--label aliyun.logs.catalina=stdout</span><br><span class="line">--label aliyun.logs.access=/usr/local/tomcat/logs/localhost_access_log.*.txt</span><br></pre></td></tr></table></figure>
+<p>您还可以在应用容器上添加更多的标签。</p>
+<ul>
+<li><code>aliyun.logs.$name = $path</code><ul>
+<li>变量 <code>name</code> 是日志名称，只能包含 0~9、a~z、A~Z 和连字符（-）。</li>
+<li>变量 <code>path</code> 是要收集的日志路径，必须具体到文件，不能只写目录。文件名部分可以使用通配符，例如，<code>/var/log/he.log</code> 和 <code>/var/log/*.log</code> 都是正确的值，但 <code>/var/log</code> 不行，不能只写到目录。<code>stdout</code> 是一个特殊值，表示标准输出。</li>
+</ul>
+</li>
+<li><code>aliyun.logs.$name.format</code>：日志格式，目前支持以下格式。<ul>
+<li>none：无格式纯文本。</li>
+<li>json：json 格式，每行一个完整的 json 字符串。</li>
+<li>csv：csv 格式。</li>
+</ul>
+</li>
+<li><p><code>aliyun.logs.$name.tags</code>：上报日志时，额外增加的字段，格式为 <code>k1=v1,k2=v2</code>，每个 key-value 之间使用逗号分隔，例如 <code>aliyun.logs.access.tags=&quot;name=hello,stage=test&quot;</code>，上报到存储的日志里就会出现 <code>name</code> 字段和 <code>stage</code> 字段。</p>
+<p>如果使用 ElasticSearch 作为日志存储，<code>target</code> 这个 tag 具有特殊含义，表示 ElasticSearch 里对应的 index。</p>
+</li>
+</ul>
+<h3 id="最后的思考"><a href="#最后的思考" class="headerlink" title="最后的思考"></a>最后的思考</h3><ul>
+<li>采集到重复数据问题，比如采集程序重启之后，读到重复数据，是否有排重？根据什么规则排重？</li>
+<li>采集数据是否会发生遗漏，比如采集程序重启之后，是否有标记最后读取的位置</li>
+<li>采集输出到后端，是否有过滤，或者可以自定义过滤</li>
+<li>采集输出到后端，是否尽量保证不丢失，采用的策略是什么</li>
+</ul>
+<p>如果log-pilot做不到上述事情,或者扩展起来麻烦，则考虑自己写个agent, 起码自己写的程序，知道如何驾驭;</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>log-pilot官方<br><a href="https://github.com/AliyunContainerService/log-pilot" target="_blank" rel="noopener">https://github.com/AliyunContainerService/log-pilot</a><br><a href="https://helpcdn.aliyun.com/document_detail/50441.html" target="_blank" rel="noopener">https://helpcdn.aliyun.com/document_detail/50441.html</a>  </li>
+<li>Docker日志收集最佳实践<br><a href="https://yq.aliyun.com/articles/72700" target="_blank" rel="noopener">https://yq.aliyun.com/articles/72700</a></li>
+<li>logspout<br><a href="https://github.com/gliderlabs/logspout" target="_blank" rel="noopener">https://github.com/gliderlabs/logspout</a></li>
+<li>logspout 网友扩展<br><a href="https://www.jianshu.com/p/bd482c13ea66" target="_blank" rel="noopener">https://www.jianshu.com/p/bd482c13ea66</a></li>
+</ul>
+<h1 id="几种采集架构图"><a href="#几种采集架构图" class="headerlink" title="几种采集架构图"></a>几种采集架构图</h1><ul>
+<li><p>业务埋点数据、应用日志数据<br>log-pilot-&gt;kafka-&gt;logstash-&gt;es-&gt;kibana<br>log-pilot-&gt;kafka-&gt;storm/spark<br><img src="/docker/docker日志收集方案/flow1.png" alt="flow1"></p>
+</li>
+<li><p>应用日志数据<br>log-pilot-&gt;logstash-&gt;es-&gt;kibana<br><img src="/docker/docker日志收集方案/flow2.png" alt="flow2"></p>
+</li>
+<li><p>采集文件日志<br>采集工具可以用log-pilot、filebeat、fluentd、flume、….<br><img src="/docker/docker日志收集方案/flow3.png" alt="flow3"></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+	
+      <div>
+        
+	<div style="text-align:center;color: #ccc;font-size:14px;">
+		------ 本文结束 <i class="fa fa-paw"></i> 感谢您的阅读 ------
+	</div>
+
+      </div>
+    
+	
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/docker/docker swarm/" rel="next" title="docker swarm mode">
+                <i class="fa fa-chevron-left"></i> docker swarm mode
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/docker/docker save-load and export-import/" rel="prev" title="docker save-load and export-import">
+                docker save-load and export-import <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar1.jpg" alt="smalldok">
+            
+              <p class="site-author-name" itemprop="name">smalldok</p>
+              <p class="site-description motion-element" itemprop="description">JAVA服务端架构，目前方向是微服务落地、基础设施、中间件、DevOps</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">96</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-bolt" title="https://github.com/alipay/sofa-bolt" rel="noopener" target="_blank">sofa-bolt</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-rpc" title="https://github.com/alipay/sofa-rpc" rel="noopener" target="_blank">sofa-rpc</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/apache/incubator-dubbo" title="https://github.com/apache/incubator-dubbo" rel="noopener" target="_blank">dubbo</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-tracer" title="https://github.com/alipay/sofa-tracer" rel="noopener" target="_blank">sofa-tracer</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-boot" title="https://github.com/alipay/sofa-boot" rel="noopener" target="_blank">sofa-boot</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/Sentinel" title="https://github.com/alibaba/Sentinel" rel="noopener" target="_blank">Sentinel</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/COLA" title="https://github.com/alibaba/COLA" rel="noopener" target="_blank">COLA</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/nacos" title="https://github.com/alibaba/nacos" rel="noopener" target="_blank">nacos</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/xuxueli/xxl-job" title="https://github.com/xuxueli/xxl-job" rel="noopener" target="_blank">xxl-job</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/ctripcorp/apollo" title="https://github.com/ctripcorp/apollo" rel="noopener" target="_blank">apollo</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/sharding-sphere" title="https://github.com/sharding-sphere" rel="noopener" target="_blank">sharding-sphere</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/fescar" title="https://github.com/alibaba/fescar" rel="noopener" target="_blank">fescar</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/liuyangming/ByteTCC" title="https://github.com/liuyangming/ByteTCC" rel="noopener" target="_blank">ByteTCC</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/changmingxie/tcc-transaction" title="https://github.com/changmingxie/tcc-transaction" rel="noopener" target="_blank">tcc-transaction</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/apache/rocketmq" title="https://github.com/apache/rocketmq" rel="noopener" target="_blank">rocketmq</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/canal" title="https://github.com/alibaba/canal" rel="noopener" target="_blank">canal</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/arthas" title="https://github.com/alibaba/arthas" rel="noopener" target="_blank">arthas</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/jvm-sandbox" title="https://github.com/alibaba/jvm-sandbox" rel="noopener" target="_blank">jvm-sandbox</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-lookout" title="https://github.com/alipay/sofa-lookout" rel="noopener" target="_blank">sofa-lookout</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/LMAX-Exchange/disruptor" title="https://github.com/LMAX-Exchange/disruptor" rel="noopener" target="_blank">disruptor</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://mpush.mydoc.io/" title="http://mpush.mydoc.io/" rel="noopener" target="_blank">mpush</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#docker-日志收集方案"><span class="nav-number">1.</span> <span class="nav-text">docker 日志收集方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#log-pilot"><span class="nav-number">1.1.</span> <span class="nav-text">log-pilot</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#采集输出到console"><span class="nav-number">1.1.1.</span> <span class="nav-text">采集输出到console</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#采集输出到ES-kibana"><span class="nav-number">1.1.2.</span> <span class="nav-text">采集输出到ES+kibana</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用编排文件运行log-pilot"><span class="nav-number">1.1.3.</span> <span class="nav-text">使用编排文件运行log-pilot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#label-说明"><span class="nav-number">1.1.4.</span> <span class="nav-text">label 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后的思考"><span class="nav-number">1.1.5.</span> <span class="nav-text">最后的思考</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.2.</span> <span class="nav-text">参考</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#几种采集架构图"><span class="nav-number">2.</span> <span class="nav-text">几种采集架构图</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2007 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">smalldok</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  <script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  <script>
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item) > -1;
+    });
+    new Valine({
+      el: '#comments' ,
+      verify: true,
+      notify: true,
+      appId: 'f4BFBRq6cf9MIWx3rmbOpfI1-gzGzoHsz',
+      appKey: '5XNBMGwfvSeUYdedf2tnQcf1',
+      placeholder: '别看了，是兄弟就来一发...',
+      avatar: 'wavatar',
+      meta:guest,
+      pageSize: '10' || 10,
+      visitor: true
+    });
+  </script>
+
+
+
+
+  
+
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+          if (result) $(this).text('复制成功');
+          else $(this).text('复制失败');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function () {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>

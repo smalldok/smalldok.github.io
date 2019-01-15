@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="深度进阶1、握手及快速重连2、绑定用户3、MPNS 消息推送流程4、HTTP代理5、端到云-发消息6、广播推送与流控7、广播推送条件过滤8、消息漫游(未实现)   握手及快速重连    tcp连接建立后，第一个消息就是握手或快速重连消息。 Handshake的目的是为了生成会话密钥，同时会把生成好的密钥存储到redis，并把key返回给客户端，为快速重连使用 FastConnect是基于Hands">
+<meta name="keywords" content="源码,消息推送">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度进阶">
+<meta property="og:url" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/index.html">
+<meta property="og:site_name" content="Smalldok&#39;s Tech Blog">
+<meta property="og:description" content="深度进阶1、握手及快速重连2、绑定用户3、MPNS 消息推送流程4、HTTP代理5、端到云-发消息6、广播推送与流控7、广播推送条件过滤8、消息漫游(未实现)   握手及快速重连    tcp连接建立后，第一个消息就是握手或快速重连消息。 Handshake的目的是为了生成会话密钥，同时会把生成好的密钥存储到redis，并把key返回给客户端，为快速重连使用 FastConnect是基于Hands">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/握手及快速重连.png">
+<meta property="og:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/绑定用户.png">
+<meta property="og:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/MPNS%20消息推送流程.png">
+<meta property="og:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/深度进阶/http代理-流程分析.png">
+<meta property="og:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/深度进阶/http代理-双向通信交互.png">
+<meta property="og:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/消息漫游-01.jpg">
+<meta property="og:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/消息漫游-02.jpg">
+<meta property="og:updated_time" content="2019-01-12T13:32:48.985Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深度进阶">
+<meta name="twitter:description" content="深度进阶1、握手及快速重连2、绑定用户3、MPNS 消息推送流程4、HTTP代理5、端到云-发消息6、广播推送与流控7、广播推送条件过滤8、消息漫游(未实现)   握手及快速重连    tcp连接建立后，第一个消息就是握手或快速重连消息。 Handshake的目的是为了生成会话密钥，同时会把生成好的密钥存储到redis，并把key返回给客户端，为快速重连使用 FastConnect是基于Hands">
+<meta name="twitter:image" content="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/握手及快速重连.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>深度进阶 | Smalldok's Tech Blog</title>
+  
+
+
+
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6cc27890b716ee2ca5deb7aa76a254f3";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Smalldok's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">穷则变、变则通、通则达</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+  
+  
+
+  
+
+  <a href="https://github.com/smalldok" class="github-corner" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/深度进阶/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="smalldok">
+      <meta itemprop="description" content="JAVA服务端架构，目前方向是微服务落地、基础设施、中间件、DevOps">
+      <meta itemprop="image" content="/images/avatar1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Smalldok's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深度进阶
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/" itemprop="url" rel="index"><span itemprop="name">源码学习</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/" itemprop="url" rel="index"><span itemprop="name">MPush</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/架构分析/" itemprop="url" rel="index"><span itemprop="name">架构分析</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/源码学习/MPush/架构分析/深度进阶/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/深度进阶/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/源码学习/MPush/架构分析/深度进阶/" class="leancloud_visitors" data-flag-title="深度进阶">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>深度进阶<br>1、握手及快速重连<br>2、绑定用户<br>3、MPNS 消息推送流程<br>4、HTTP代理<br>5、端到云-发消息<br>6、广播推送与流控<br>7、广播推送条件过滤<br>8、消息漫游(未实现)  </p>
+<h1 id="握手及快速重连"><a href="#握手及快速重连" class="headerlink" title="握手及快速重连"></a>握手及快速重连</h1><p><img src="/源码学习/MPush/架构分析/深度进阶/握手及快速重连.png" alt="握手及快速重连">  </p>
+<ul>
+<li>tcp连接建立后，第一个消息就是握手或快速重连消息。</li>
+<li>Handshake的目的是为了生成会话密钥，同时会把生成好的密钥存储到redis，并把key返回给客户端，为快速重连使用</li>
+<li>FastConnect是基于Handshake生成的sessionId来配合使用的，目的是为了减少RSA加密的使用次数，特别是网络较差的情况，毕竟RSA加密想对还是比较耗时的，客户端只需把sessionId传给服务端，其就能从redis中取出上次会话信息，恢复到上次握手成功之后的会话状态，这个过程不需要任何加密和密钥交换，相对会比较快速。</li>
+</ul>
+<h1 id="绑定用户"><a href="#绑定用户" class="headerlink" title="绑定用户"></a>绑定用户</h1><p><img src="/源码学习/MPush/架构分析/深度进阶/绑定用户.png" alt="绑定用户">  </p>
+<ul>
+<li>握手成功后表示安全通道已经建立，但同时还要给连接设置用户甚至标签，只有这样业务才能更好的去识别用户（没有用户的业务是另外一回事）。</li>
+<li>设置用户非常简单，只需把其存储到session即可，但因为要支持集群的，就必须把用户的位置信息（或者叫路由信息）发布出去，让集群里的其他机器能够通过useId来查找用户的位置（在哪台机器），因为客户端的TCP连接在哪台机器，那么和这个客户端的所有数据传输都必须经过这台机器的这个连接！(很多同学会问为什么不把connection存储到redis)。</li>
+<li>路由中心有两部分组成：本地路由和远程路由，本地路由数据结构为userId-&gt;connection的map，数据存储在本机内存；远程路由数据结构为userId-&gt;connServer机器ip，数据存储在redis;所以要给一个用户发信息必须先查远程路由，找到用户在哪台机器，然后把消息发给这台机器，让其去本地路由查找connection并通过查找到的TCP连接把消息发给用户。</li>
+<li>MessageCenter之前使用的redis提供的pub/sub实现的，也可以自己搭建MQ来实现，最新版踢人已经不再使用pub/sub，而是直接使用udp网关实现。</li>
+<li>踢人：之所以会有踢人的情况是根据业务需要来的，有些业务系统是不允许同一个用户在多个设备同时在线的，或者只允许不同类型的终端同时在线，比如QQ,手机和PC可以同时在线，但同一个帐号在两台PC登录时其中一个肯定会被踢下线，mpush的踢人要表达的也是同一个意思。</li>
+<li>顺便提一下关于同时在线的策略，或者说端的类型的定义mpush已经支持SPI定制化。</li>
+</ul>
+<h1 id="MPNS-消息推送流程"><a href="#MPNS-消息推送流程" class="headerlink" title="MPNS 消息推送流程"></a>MPNS 消息推送流程</h1><p><img src="/源码学习/MPush/架构分析/深度进阶/MPNS 消息推送流程.png" alt="MPNS 消息推送流程"><br>1、PushSender是消息推送的入口，它的实现在mpush-client模块属于服务端SDK，主要包含有GatewayClient, RemoteRouterManager; RemoteRouterManager用于定位用户在哪台机器，有没有在线等，而GatewayClient用于把要发送的的业务消息发给用户TCP连接所在的机器。</p>
+<p>2、GatewayServer负责接收GatewayClient发送过来的消息，然后到LocalRouterManager查找用户的Connection，然后把消息交由其下发。</p>
+<p>3、ConnectionServer 负责维持所有连接到当前机器的客户端连接，所以消息最终还是尤其下发（图比较简单，但能表达核心流程）。</p>
+<h1 id="HTTP代理"><a href="#HTTP代理" class="headerlink" title="HTTP代理"></a>HTTP代理</h1><h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>前面有提到过http代理这个东西，但很多人不知道这个东西该怎么用，或者说有什么用？以及在什么场景下使用？     </p>
+<h3 id="移动APP通信场景分析"><a href="#移动APP通信场景分析" class="headerlink" title="移动APP通信场景分析"></a>移动APP通信场景分析</h3><p>从使用的链接情况来看，一般可以分为两大类：TCP长链接，HTTP短链接；长链接用于消息推送或IM等场景，HTTP用于业务数据的查询或修改。虽然不是所有的APP都需要IM功能，但大多应用都需要消息推送功能。为了推送消息，APP必须维持一根长链接，但大部分时间除了心跳这根链接上是没多少消息在传输的，特别是非IM类的APP，因为这类应用并没大量的消息要不停的推送，维持长链接只是为了消息的及时到达，这势必造成了很大的资源浪费！</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>针对上述情况MPUSH提供了Http代理方案，目的一是充分利用push通道，而是提高数据传输效率节省电量，节省流量，提供比http更高的安全性。</p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><p>MPushClient 提供了一个叫sendHttp的方法，该方法用于把客户端原本要通过HTTP方式发送的请求，全部通过PUSH通道转发，实现整个链路的长链接化；通过这种方式应用大大减少Http短链接频繁的创建，不仅仅节省电量，经过测试证明请求时间比原来至少缩短一倍，而且MPush提供的还有数据压缩功能，对于比较大的数据还能大大节省流量(压缩率4-10倍)，更重要的是所有通过代理的数据都是加密后传输的，大大提高了安全性！</p>
+<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><h3 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h3><p>1、修改mpush.conf增加mp.http.proxy-enabled=true启用http代理<br>2、修改mpush.conf增加dns-mapping配置，示例如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mp.http.dns-mapping=&#123;//域名映射外网地址转内部IP</span><br><span class="line">  &quot;api.jituancaiyun.com&quot;:[&quot;10.0.10.1:8080&quot;, &quot;10.0.10.2:8080&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>说明：因为mpush server要做http代理转发，而客户端传过来的一般是域名比如<a href="http://api.jituancaiyun.com/get/userInfo.json为了不到公网上再绕一圈建议把mpush" target="_blank" rel="noopener">http://api.jituancaiyun.com/get/userInfo.json为了不到公网上再绕一圈建议把mpush</a> server 和业务服务(api.jituancaiyun.com)部署到同一个局域网，并增域名api.jituancaiyun.com到提供该服务的集群机器内网ip之间的一个映射，这样mpush server就可以通过局域网把请求转发到具体到业务服务，效率更高！</p>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><p>1、设置ClientConfig.setEnableHttpProxy(true)来启用客户端代理。<br>2、通过Client.sendHttp(HttpRequest request)方法来发送请求。<br>AndroidSDK通过com.mpush.android.MPush#sendHttpProxy(HttpRequest request)来发送比较合适。</p>
+<h2 id="流程分析"><a href="#流程分析" class="headerlink" title="流程分析"></a>流程分析</h2><p><img src="深度进阶/http代理-流程分析.png" alt="http代理-流程分析">    </p>
+<ul>
+<li>Client代表App业务比如查询用户信息的接口</li>
+<li>MPushApiProxy是一个工具类用于负责处理当前请求是使用普通的HTTP还是使用MPush长链接通道，这个类在SDK中说不存在的，是我们公司内部的业务，实现起来也很简单，建议Android工程中增加这么一个角色，而不是到处直接去依赖Mpush的代码，方便以后解耦。</li>
+<li>MPushClient这个SDK已经提供，用于把Http协议打包成mpush协议。</li>
+<li>HttpProxyHandler包括后面的几个组件都是服务端业务组件。用于接收客户端传过来的请求并反解为Http协议，然后通过DNSMapping找到域名对应的局域网IP，再通过内置的HttpClient，把请求转发给业务WEB服务，并把业务服务的返回值(HttpResponse)打包成MPush协议发送到客户端。</li>
+<li>DNSMapping负责通过域名解析成局域网IP，并具有负载均衡以及简单的健康检查功能(针对所配置的WEB服务)</li>
+<li>HttpClient目前使用的是用Netty实现的全异步的一个HttpClient，负责通过http的方式请求业务服务。</li>
+<li>Nginx是业务服务，也可以是Tomcat，特别需要建议的是链接超时时间配置长一些。</li>
+</ul>
+<h2 id="为什么要这样实现？"><a href="#为什么要这样实现？" class="headerlink" title="为什么要这样实现？"></a>为什么要这样实现？</h2><p>为什么要这样实现？因为这样做对原有的业务系统侵入特别低，如果MPushApiProxy这个组件设计的好，对于最两边的业务组件/服务(Client,Nginx)，对请求方式应该是无感知的，这个角色是无法区分到底请求是通过普通的Http方式发送出去的还是通过长链接代理的方式发送的！！！<br>另附上通过Http Proxy 实现双向通信交互图</p>
+<p><img src="深度进阶/http代理-双向通信交互.png" alt="http代理-双向通信交互">    </p>
+<h1 id="端到云-发消息"><a href="#端到云-发消息" class="headerlink" title="端到云-发消息"></a>端到云-发消息</h1><h2 id="接口产生背景"><a href="#接口产生背景" class="headerlink" title="接口产生背景"></a>接口产生背景</h2><p>作为一个纯粹推送系统，最初是没有发送上行消息接口的只有下行的消息，毕竟MPush不是IM系统。<br>后来在很多同学的要求下，就增加了此接口用于cleint上报消息。</p>
+<h2 id="接口的使用"><a href="#接口的使用" class="headerlink" title="接口的使用"></a>接口的使用</h2><p>此接口和服务端下行Push保持相同的协议，可以互发消息，默认服务端没有对消息做任何业务上的处理，收到后直接丢弃。<br>同时MPush提供了SPI的方式来接管客户端发过来的消息，具体请参考<a href="http://mpush.mydoc.io/?v=24639&amp;t=134851" target="_blank" rel="noopener">第三章 系统架构 - SPI定制化</a>。<br>如果没有特殊需求客户端上行消息建议使用Http Proxy模式。</p>
+<h1 id="广播推送与流控"><a href="#广播推送与流控" class="headerlink" title="广播推送与流控"></a>广播推送与流控</h1><h2 id="什么是广播推送？"><a href="#什么是广播推送？" class="headerlink" title="什么是广播推送？"></a>什么是广播推送？</h2><p>按推送用户范围来划分，MPush目前支持三种方式的推送：</p>
+<ul>
+<li>单用户推送，推送消息给指定的某个用户。</li>
+<li>批量推送，业务自己圈定一批用户，推送同一条消息给圈定的用户。</li>
+<li>全网推送，推送消息给所有的在线用户。 这里所说的广播推送指的就是第三种用户范围的推送。</li>
+</ul>
+<h2 id="为什么广播推送要控制流量？"><a href="#为什么广播推送要控制流量？" class="headerlink" title="为什么广播推送要控制流量？"></a>为什么广播推送要控制流量？</h2><p>因为要推送消息给全网在线用户，用户量可能非常大，为了防止瞬时流量过大，所有加了入了防过载保护：流量控制。</p>
+<h2 id="流量控制的使用"><a href="#流量控制的使用" class="headerlink" title="流量控制的使用"></a>流量控制的使用</h2><ul>
+<li>单任务流量控制</li>
+<li>全局流量控制</li>
+</ul>
+<h1 id="广播推送条件过滤"><a href="#广播推送条件过滤" class="headerlink" title="广播推送条件过滤"></a>广播推送条件过滤</h1><h2 id="为什么要对用户进行过滤？"><a href="#为什么要对用户进行过滤？" class="headerlink" title="为什么要对用户进行过滤？"></a>为什么要对用户进行过滤？</h2><p>因为广播是针对所有在线用户，为了更精准的推送，必须对目标用户进行筛选，才能满足个性化的业务需求。</p>
+<h2 id="目前支持的筛选纬度"><a href="#目前支持的筛选纬度" class="headerlink" title="目前支持的筛选纬度"></a>目前支持的筛选纬度</h2><ul>
+<li>tag：业务自己打的标签</li>
+<li>userId：用户登录ID</li>
+<li>clientVersion：客户端版本</li>
+<li>osName：客户端系统平台</li>
+<li>osVersion：客户端系统版本</li>
+</ul>
+<h2 id="目前支持的表达式"><a href="#目前支持的表达式" class="headerlink" title="目前支持的表达式"></a>目前支持的表达式</h2><p>目前只支持jvm内置的<code>Nashorn</code>脚本引擎，语法为javascript标准语法。</p>
+<h2 id="使用用例"><a href="#使用用例" class="headerlink" title="使用用例"></a>使用用例</h2><p>具体请参照com.mpush.api.push.PushContext.java</p>
+<ul>
+<li>灰度20%的在线用户：<code>userId % 100 &lt; 20</code></li>
+<li>包含test标签的用户：<code>tags!=null &amp;&amp; tags.indexOf(&quot;test&quot;)!=-1</code></li>
+<li>客户端版本号大于2.0的安卓用户：<code>clientVersion.indexOf(&quot;android&quot;)!=-1 &amp;&amp; clientVersion.replace(/[^\d]/g,&quot;&quot;) &gt; 20</code></li>
+</ul>
+<h1 id="消息漫游-未实现"><a href="#消息漫游-未实现" class="headerlink" title="消息漫游(未实现)"></a>消息漫游(未实现)</h1><p>如果不需要支持“消息漫游”，对于在线消息，如果用户接收到，是不需要存储到数据库的。但如果要支持“换一台机器也能看到历史的聊天消息”，就需要对所有消息进行存储。<br><img src="/源码学习/MPush/架构分析/深度进阶/消息漫游-01.jpg" alt="消息漫游-01">  </p>
+<p>消息投递如上图，用户A发送消息给用户B，虽然B在线，仍然要增加一个步骤2.5，<code>在投递之前进行存储，以备B的其他端登陆时，可以拉取到历史消息。</code><br><img src="/源码学习/MPush/架构分析/深度进阶/消息漫游-02.jpg" alt="消息漫游-02">  </p>
+<p>消息拉取如上图，原本不在线的B(phone端)重新登录了，怎么拉取历史消息呢？<br><code>只需要在客户端本地存储一个上一次拉取到的msg_id(time)</code>，到服务端重新拉取即可。</p>
+<p>这里还有个问题，由于服务端存储所有消息成本是非常高的，所以一般“消息漫游”是有时间（或者消息数）限制，<code>不能拉取所有所有几年前的历史消息</code>，只能拉取最近的云端消息。</p>
+<p>参考 架构师之路：<br><a href="https://mp.weixin.qq.com/s/gHnq-VqRSBX-UiGd306NDw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/gHnq-VqRSBX-UiGd306NDw</a>  《微信多点登录，消息漫游，假如让你来实现？》</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+	
+      <div>
+        
+	<div style="text-align:center;color: #ccc;font-size:14px;">
+		------ 本文结束 <i class="fa fa-paw"></i> 感谢您的阅读 ------
+	</div>
+
+      </div>
+    
+	
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码/" rel="tag"><i class="fa fa-tag"></i> 源码</a>
+          
+            <a href="/tags/消息推送/" rel="tag"><i class="fa fa-tag"></i> 消息推送</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/源码学习/MPush/架构分析/系统架构说明/" rel="next" title="系统架构说明">
+                <i class="fa fa-chevron-left"></i> 系统架构说明
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/源码学习/MPush/架构分析/消息类型和消息协议/" rel="prev" title="消息类型和消息协议">
+                消息类型和消息协议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar1.jpg" alt="smalldok">
+            
+              <p class="site-author-name" itemprop="name">smalldok</p>
+              <p class="site-description motion-element" itemprop="description">JAVA服务端架构，目前方向是微服务落地、基础设施、中间件、DevOps</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">96</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-bolt" title="https://github.com/alipay/sofa-bolt" rel="noopener" target="_blank">sofa-bolt</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-rpc" title="https://github.com/alipay/sofa-rpc" rel="noopener" target="_blank">sofa-rpc</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/apache/incubator-dubbo" title="https://github.com/apache/incubator-dubbo" rel="noopener" target="_blank">dubbo</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-tracer" title="https://github.com/alipay/sofa-tracer" rel="noopener" target="_blank">sofa-tracer</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-boot" title="https://github.com/alipay/sofa-boot" rel="noopener" target="_blank">sofa-boot</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/Sentinel" title="https://github.com/alibaba/Sentinel" rel="noopener" target="_blank">Sentinel</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/COLA" title="https://github.com/alibaba/COLA" rel="noopener" target="_blank">COLA</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/nacos" title="https://github.com/alibaba/nacos" rel="noopener" target="_blank">nacos</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/xuxueli/xxl-job" title="https://github.com/xuxueli/xxl-job" rel="noopener" target="_blank">xxl-job</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/ctripcorp/apollo" title="https://github.com/ctripcorp/apollo" rel="noopener" target="_blank">apollo</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/sharding-sphere" title="https://github.com/sharding-sphere" rel="noopener" target="_blank">sharding-sphere</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/fescar" title="https://github.com/alibaba/fescar" rel="noopener" target="_blank">fescar</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/liuyangming/ByteTCC" title="https://github.com/liuyangming/ByteTCC" rel="noopener" target="_blank">ByteTCC</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/changmingxie/tcc-transaction" title="https://github.com/changmingxie/tcc-transaction" rel="noopener" target="_blank">tcc-transaction</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/apache/rocketmq" title="https://github.com/apache/rocketmq" rel="noopener" target="_blank">rocketmq</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/canal" title="https://github.com/alibaba/canal" rel="noopener" target="_blank">canal</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/arthas" title="https://github.com/alibaba/arthas" rel="noopener" target="_blank">arthas</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alibaba/jvm-sandbox" title="https://github.com/alibaba/jvm-sandbox" rel="noopener" target="_blank">jvm-sandbox</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/alipay/sofa-lookout" title="https://github.com/alipay/sofa-lookout" rel="noopener" target="_blank">sofa-lookout</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/LMAX-Exchange/disruptor" title="https://github.com/LMAX-Exchange/disruptor" rel="noopener" target="_blank">disruptor</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://mpush.mydoc.io/" title="http://mpush.mydoc.io/" rel="noopener" target="_blank">mpush</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#握手及快速重连"><span class="nav-number">1.</span> <span class="nav-text">握手及快速重连</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#绑定用户"><span class="nav-number">2.</span> <span class="nav-text">绑定用户</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MPNS-消息推送流程"><span class="nav-number">3.</span> <span class="nav-text">MPNS 消息推送流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTP代理"><span class="nav-number">4.</span> <span class="nav-text">HTTP代理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用场景"><span class="nav-number">4.1.</span> <span class="nav-text">使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">4.1.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移动APP通信场景分析"><span class="nav-number">4.1.2.</span> <span class="nav-text">移动APP通信场景分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">4.1.3.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现原理"><span class="nav-number">4.1.4.</span> <span class="nav-text">实现原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用方式"><span class="nav-number">4.2.</span> <span class="nav-text">使用方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端"><span class="nav-number">4.2.1.</span> <span class="nav-text">服务端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端"><span class="nav-number">4.2.2.</span> <span class="nav-text">客户端</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程分析"><span class="nav-number">4.3.</span> <span class="nav-text">流程分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要这样实现？"><span class="nav-number">4.4.</span> <span class="nav-text">为什么要这样实现？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#端到云-发消息"><span class="nav-number">5.</span> <span class="nav-text">端到云-发消息</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#接口产生背景"><span class="nav-number">5.1.</span> <span class="nav-text">接口产生背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口的使用"><span class="nav-number">5.2.</span> <span class="nav-text">接口的使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#广播推送与流控"><span class="nav-number">6.</span> <span class="nav-text">广播推送与流控</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是广播推送？"><span class="nav-number">6.1.</span> <span class="nav-text">什么是广播推送？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么广播推送要控制流量？"><span class="nav-number">6.2.</span> <span class="nav-text">为什么广播推送要控制流量？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流量控制的使用"><span class="nav-number">6.3.</span> <span class="nav-text">流量控制的使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#广播推送条件过滤"><span class="nav-number">7.</span> <span class="nav-text">广播推送条件过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要对用户进行过滤？"><span class="nav-number">7.1.</span> <span class="nav-text">为什么要对用户进行过滤？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目前支持的筛选纬度"><span class="nav-number">7.2.</span> <span class="nav-text">目前支持的筛选纬度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目前支持的表达式"><span class="nav-number">7.3.</span> <span class="nav-text">目前支持的表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用用例"><span class="nav-number">7.4.</span> <span class="nav-text">使用用例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#消息漫游-未实现"><span class="nav-number">8.</span> <span class="nav-text">消息漫游(未实现)</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2007 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">smalldok</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  <script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  <script>
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item) > -1;
+    });
+    new Valine({
+      el: '#comments' ,
+      verify: true,
+      notify: true,
+      appId: 'f4BFBRq6cf9MIWx3rmbOpfI1-gzGzoHsz',
+      appKey: '5XNBMGwfvSeUYdedf2tnQcf1',
+      placeholder: '别看了，是兄弟就来一发...',
+      avatar: 'wavatar',
+      meta:guest,
+      pageSize: '10' || 10,
+      visitor: true
+    });
+  </script>
+
+
+
+
+  
+
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+          if (result) $(this).text('复制成功');
+          else $(this).text('复制失败');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function () {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>
