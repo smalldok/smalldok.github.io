@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/docker/docker run --restart and --rm/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/设计模式/3-策略模式Strategy/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/docker/docker run --restart and --rm/" class="post-title-link" itemprop="url">docker run --restart and --rm</a>
+                <a href="/设计模式/3-策略模式Strategy/" class="post-title-link" itemprop="url">3-策略模式Strategy</a>
               
             
           </h1>
@@ -458,7 +458,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/容器/" itemprop="url" rel="index"><span itemprop="name">容器</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/设计模式/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a></span>
 
                 
                 
@@ -473,8 +473,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/docker/docker run --restart and --rm/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/docker/docker run --restart and --rm/" itemprop="commentCount"></span>
+                <a href="/设计模式/3-策略模式Strategy/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/设计模式/3-策略模式Strategy/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -482,7 +482,7 @@
 
           
           
-             <span id="/docker/docker run --restart and --rm/" class="leancloud_visitors" data-flag-title="docker run --restart and --rm">
+             <span id="/设计模式/3-策略模式Strategy/" class="leancloud_visitors" data-flag-title="3-策略模式Strategy">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -515,26 +515,40 @@
       
         
           
-            <h1 id="Docker容器的重启策略"><a href="#Docker容器的重启策略" class="headerlink" title="Docker容器的重启策略"></a>Docker容器的重启策略</h1><p>Docker容器的重启策略是面向生产环境的一个启动策略，在开发过程中可以忽略该策略。<br>Docker容器的重启都是由Docker守护进程完成的，因此与守护进程息息相关。  </p>
-<p>Docker容器的重启策略如下：</p>
-<ul>
-<li>no，默认策略，在容器退出时不重启容器</li>
-<li>on-failure，在容器非正常退出时（退出状态非0），才会重启容器<br>on-failure:3，在容器非正常退出时重启容器，最多重启3次</li>
-<li>always，在容器退出时总是重启容器</li>
-<li>unless-stopped，在容器退出时总是重启容器，但是不考虑在Docker守护进程启动时就已经停止了的容器</li>
+            <h1 id="作用与场景"><a href="#作用与场景" class="headerlink" title="作用与场景"></a>作用与场景</h1><ul>
+<li>避免代码臃肿难以阅读，如非常多的if..else，参照单一原则，使每种事情得以抽象出来，代码结构更加清晰（曾经参加面试时，有面试官问，如果if..else过多怎么解决，当时一脸懵逼）；</li>
+<li>常用于负载均衡策略的选择、商品税率、商品活动等场景，在很多开源中间件中也都有策略模式的影子（多看源码有好处）；</li>
 </ul>
-<h1 id="docker-run的–restart选项"><a href="#docker-run的–restart选项" class="headerlink" title="docker run的–restart选项"></a>docker run的–restart选项</h1><p>通过<code>--restart</code>选项，可以设置容器的重启策略，以决定在容器退出时Docker守护进程是否重启刚刚退出的容器。<br><code>--restart</code>选项通常只用于detached模式的容器。<br><code>--restart</code>选项不能与<code>--rm</code>选项同时使用。显然，<code>--restart</code>选项适用于detached模式的容器，而<code>--rm</code>选项适用于foreground模式的容器。</p>
-<p>在<code>docker ps</code>查看容器时，对于使用了<code>--restart</code>选项的容器，其可能的状态只有<code>Up</code>或<code>Restarting</code>两种状态。</p>
-<p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --restart=always bba-208</span><br><span class="line">docker run -d --restart=on-failure:10 bba-208</span><br></pre></td></tr></table></figure>
-<p>补充：</p>
-<p>查看容器重启次数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect -f &quot;&#123;&#123; .RestartCount &#125;&#125;&quot; bba-208</span><br></pre></td></tr></table></figure>
-<p>查看容器最后一次的启动时间<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect -f &quot;&#123;&#123; .State.StartedAt &#125;&#125;&quot; bba-208</span><br></pre></td></tr></table></figure></p>
-<h1 id="docker-run的–rm选项"><a href="#docker-run的–rm选项" class="headerlink" title="docker run的–rm选项"></a>docker run的–rm选项</h1><p>在Docker容器退出时，默认容器内部的文件系统仍然被保留，以方便调试并保留用户数据。<br>但是，对于foreground容器，由于其只是在开发调试过程中短期运行，其用户数据并无保留的必要，因而可以在容器启动时设置<code>--rm</code>选项，这样在容器退出时就能够自动清理容器内部的文件系统。示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --rm bba-208</span><br></pre></td></tr></table></figure></p>
-<p>等价于<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --rm=true bba-208</span><br></pre></td></tr></table></figure></p>
-<p>显然，<code>--rm</code>选项不能与<code>-d</code>同时使用，即只能自动清理foreground容器，不能自动清理detached容器<br>注意，<code>--rm</code>选项也会清理容器的匿名data volumes。</p>
-<p>所以，执行<code>docker run</code>命令带<code>--rm</code>命令选项，等价于在容器退出后，执行<code>docker rm -v</code>。</p>
+<h1 id="策略模式的几个角色："><a href="#策略模式的几个角色：" class="headerlink" title="策略模式的几个角色："></a>策略模式的几个角色：</h1><ul>
+<li>策略接口Strategy</li>
+<li>具体策略对象xxxxStrategy</li>
+<li>执行策略对象invoker，内部持有一个策略类的引用</li>
+<li>客户端对象Client</li>
+</ul>
+<h1 id="策略模式关系图"><a href="#策略模式关系图" class="headerlink" title="策略模式关系图"></a>策略模式关系图</h1><p><img src="/设计模式/3-策略模式Strategy/策略模式关系图.png" alt="策略模式关系图"></p>
+<h1 id="举例："><a href="#举例：" class="headerlink" title="举例："></a>举例：</h1><p>负载均衡策略的选择，包括随机、轮询、权重等</p>
+<h2 id="策略接口Strategy"><a href="#策略接口Strategy" class="headerlink" title="策略接口Strategy"></a>策略接口Strategy</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Strategy</span></span>&#123;</span><br><span class="line">    <span class="function">Server <span class="title">select</span><span class="params">(List&lt;Server&gt; serverList)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="具体策略对象xxxxStrategy"><a href="#具体策略对象xxxxStrategy" class="headerlink" title="具体策略对象xxxxStrategy"></a>具体策略对象xxxxStrategy</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 随机策略</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RandomStrategy</span> <span class="keyword">implements</span> <span class="title">Strategy</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Server <span class="title">select</span><span class="params">(List&lt;Server&gt; serverList)</span></span>&#123;</span><br><span class="line">        <span class="comment">//TODO随机算法实现</span></span><br><span class="line">        <span class="comment">//Server server= ...</span></span><br><span class="line">        <span class="keyword">return</span> server;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 轮询策略</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RoundRobinStrategy</span> <span class="keyword">implements</span> <span class="title">Strategy</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Server <span class="title">select</span><span class="params">(List&lt;Server&gt; serverList)</span></span>&#123;</span><br><span class="line">        <span class="comment">//TODO轮询算法实现</span></span><br><span class="line">        <span class="comment">//Server server= ...</span></span><br><span class="line">        <span class="keyword">return</span> server;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="执行策略对象invoker"><a href="#执行策略对象invoker" class="headerlink" title="执行策略对象invoker"></a>执行策略对象invoker</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerDiscovery</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Strategy strategy;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ServerDiscovery</span><span class="params">(Strategy strategy)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.strategy=strategy;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">discovery</span><span class="params">(String serverName)</span></span>&#123;</span><br><span class="line">        <span class="comment">//获取所有服务节点</span></span><br><span class="line">        List&lt;Server&gt; serverList= zkClient.lookup(serverName);</span><br><span class="line">        <span class="comment">//利用策略，选择一台节点</span></span><br><span class="line">        Server server=strategy.select(serverList);</span><br><span class="line">        <span class="keyword">return</span> server.host+<span class="string">":"</span>+server.port;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="客户端对象Client"><a href="#客户端对象Client" class="headerlink" title="客户端对象Client"></a>客户端对象Client</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//使用随机策略选择一台节点</span></span><br><span class="line">        ServerDiscovery sd=<span class="keyword">new</span> ServerDiscovery(<span class="keyword">new</span> RandomStrategy());</span><br><span class="line">        String hostAndPort=sd.discovery(<span class="string">"SERVER_NAME"</span>);</span><br><span class="line">        System.out.println(hostAndPort);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>这里只是抛砖引玉，更好的实现见spring cloud中的Ribbon负载均衡策略；</p>
+<p>优点：  </p>
+<ul>
+<li>避免代码臃肿难以阅读，如非常多的if..else，参照单一原则，使每种事情得以抽象出来，代码结构更加清晰；</li>
+</ul>
+<p>缺点：  </p>
+<ul>
+<li>客户端必须知道所有的策略类，并自行决定使用哪一个策略类。这就意味着客户端必须理解这些算法的区别，以便适时选择恰当的算法类。换言之，策略模式只适用于客户端知道算法或行为的情况。</li>
+<li>由于策略模式把每个具体的策略实现都单独封装成为类，如果备选的策略很多的话，那么对象的数目就会很多(说缺点有些牵强，能多出来多少呢！)；</li>
+</ul>
+<p><br><br> 设计模式系列文章:</p>
+<ul>
+<li><a href="../1-命令模式Command">1-命令模式Command</a></li>
+<li><a href="../2-责任链模式Filter">2-责任链模式Filter</a></li>
+<li><strong><a href="../3-策略模式Strategy">3-策略模式Strategy</a></strong></li>
+</ul>
+<h2><font style="color:red">写得不好，仅供参考！</font></h2>
 
           
         
@@ -582,7 +596,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -627,7 +641,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -692,7 +706,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -737,7 +753,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

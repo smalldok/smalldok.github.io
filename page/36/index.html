@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/功能组件/Logs/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/MPNS/编码解码/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/功能组件/Logs/" class="post-title-link" itemprop="url">Logs</a>
+                <a href="/源码学习/MPush/源码分析/MPNS/编码解码/" class="post-title-link" itemprop="url">编码解码</a>
               
             
           </h1>
@@ -479,7 +479,7 @@
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/功能组件/" itemprop="url" rel="index"><span itemprop="name">功能组件</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/MPNS/" itemprop="url" rel="index"><span itemprop="name">MPNS</span></a></span>
 
                 
                 
@@ -494,8 +494,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/功能组件/Logs/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/功能组件/Logs/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/源码分析/MPNS/编码解码/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/MPNS/编码解码/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -503,7 +503,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/功能组件/Logs/" class="leancloud_visitors" data-flag-title="Logs">
+             <span id="/源码学习/MPush/源码分析/MPNS/编码解码/" class="leancloud_visitors" data-flag-title="编码解码">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -536,31 +536,14 @@
       
         
           
-            <h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><p>Logs.init();</p>
-<ul>
-<li>MPush启动时；</li>
-<li>客户端连接时；</li>
-</ul>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Logs.Console.warn(<span class="string">"你正在使用的CacheManager只能用于源码测试，生产环境请使用redis 3.x."</span>);</span><br></pre></td></tr></table></figure>
-<h1 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">10</span>:<span class="number">06</span>:<span class="number">48.366</span> -[console]- 你正在使用的CacheManager只能用于源码测试，生产环境请使用redis <span class="number">3</span>.x.</span><br></pre></td></tr></table></figure>
-<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * (C) Copyright 2015-2016 the original author or authors.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Licensed under the Apache License, Version 2.0 (the "License");</span></span><br><span class="line"><span class="comment"> * you may not use this file except in compliance with the License.</span></span><br><span class="line"><span class="comment"> * You may obtain a copy of the License at</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * http://www.apache.org/licenses/LICENSE-2.0</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Unless required by applicable law or agreed to in writing, software</span></span><br><span class="line"><span class="comment"> * distributed under the License is distributed on an "AS IS" BASIS,</span></span><br><span class="line"><span class="comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></span><br><span class="line"><span class="comment"> * See the License for the specific language governing permissions and</span></span><br><span class="line"><span class="comment"> * limitations under the License.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Contributors:</span></span><br><span class="line"><span class="comment"> *   ohun@live.cn (夜色)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.mpush.tools.log;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.mpush.tools.config.CC;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.ConfigRenderOptions;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by ohun on 2016/5/16.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> ohun@live.cn</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Logs</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> logInit = init();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (logInit) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        System.setProperty(<span class="string">"log.home"</span>, CC.mp.log_dir);</span><br><span class="line">        System.setProperty(<span class="string">"log.root.level"</span>, CC.mp.log_level);</span><br><span class="line">        System.setProperty(<span class="string">"logback.configurationFile"</span>, CC.mp.log_conf_path);</span><br><span class="line">        LoggerFactory</span><br><span class="line">                .getLogger(<span class="string">"console"</span>)</span><br><span class="line">                .info(CC.mp.cfg.root().render(ConfigRenderOptions.concise().setFormatted(<span class="keyword">true</span>)));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Logger Console = LoggerFactory.getLogger(<span class="string">"console"</span>),</span><br><span class="line"></span><br><span class="line">    CONN = LoggerFactory.getLogger(<span class="string">"mpush.conn.log"</span>),</span><br><span class="line"></span><br><span class="line">    MONITOR = LoggerFactory.getLogger(<span class="string">"mpush.monitor.log"</span>),</span><br><span class="line"></span><br><span class="line">    PUSH = LoggerFactory.getLogger(<span class="string">"mpush.push.log"</span>),</span><br><span class="line"></span><br><span class="line">    HB = LoggerFactory.getLogger(<span class="string">"mpush.heartbeat.log"</span>),</span><br><span class="line"></span><br><span class="line">    CACHE = LoggerFactory.getLogger(<span class="string">"mpush.cache.log"</span>),</span><br><span class="line"></span><br><span class="line">    RSD = LoggerFactory.getLogger(<span class="string">"mpush.srd.log"</span>),</span><br><span class="line"></span><br><span class="line">    HTTP = LoggerFactory.getLogger(<span class="string">"mpush.http.log"</span>),</span><br><span class="line"></span><br><span class="line">    PROFILE = LoggerFactory.getLogger(<span class="string">"mpush.profile.log"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><br><br> 功能组件文章目录:</p>
-<ul>
-<li><a href="../CC-配置中心">CC-配置中心</a></li>
-<li><a href="../EventBus-事件总线">EventBus-事件总线</a></li>
-<li><a href="../FlowControl-流控">FlowControl-流控</a></li>
-<li><a href="../JVMUtil">JVMUtil</a></li>
-<li><strong><a href="../Logs">Logs</a></strong></li>
-<li><a href="../Profiler-统计方法或者线程执行时间">Profiler-统计方法或者线程执行时间</a></li>
-<li><a href="../Profiler入门">Profiler入门</a></li>
-<li><a href="../SPI机制">SPI机制</a></li>
-<li><a href="../TimeLine-时间线">TimeLine-时间线</a></li>
-<li><a href="../服务启动监听">服务启动监听</a></li>
-<li><a href="../监控">监控</a></li>
-<li><a href="../通信模型与超时控制">通信模型与超时控制</a></li>
-<li><a href="../线程池">线程池</a></li>
-<li><a href="../状态判断-位运算">状态判断-位运算</a></li>
-</ul>
+            
+
+	<div class="row">
+    <embed src="编码解码.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+ 
 
           
         
@@ -608,7 +591,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/35/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><span class="page-number current">36</span><a class="page-number" href="/page/37/">37</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/37/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/35/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><span class="page-number current">36</span><a class="page-number" href="/page/37/">37</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/37/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -653,7 +636,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -718,7 +701,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -763,7 +748,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/h2客户端工具DbVisualizer/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/docker/docker save-load and export-import/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/h2客户端工具DbVisualizer/" class="post-title-link" itemprop="url">h2客户端工具DbVisualizer</a>
+                <a href="/docker/docker save-load and export-import/" class="post-title-link" itemprop="url">docker save-load and export-import</a>
               
             
           </h1>
@@ -458,7 +458,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/嵌入式数据库/" itemprop="url" rel="index"><span itemprop="name">嵌入式数据库</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/容器/" itemprop="url" rel="index"><span itemprop="name">容器</span></a></span>
 
                 
                 
@@ -473,8 +473,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/h2客户端工具DbVisualizer/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/h2客户端工具DbVisualizer/" itemprop="commentCount"></span>
+                <a href="/docker/docker save-load and export-import/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/docker/docker save-load and export-import/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -482,7 +482,7 @@
 
           
           
-             <span id="/h2客户端工具DbVisualizer/" class="leancloud_visitors" data-flag-title="h2客户端工具DbVisualizer">
+             <span id="/docker/docker save-load and export-import/" class="leancloud_visitors" data-flag-title="docker save-load and export-import">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -515,20 +515,61 @@
       
         
           
-            <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><blockquote>
-<p>一般springboot中启动h2，即可通过网页访问控制台，来操作H2；<br>如，<code>http://localhost:9088/xxxserver/h2-console</code><br>但是要启动项目才能访问，极大的不方便；<br>因此需要第三方工具直接打开<code>mychannel.mv.db</code>文件，像在console上操作一样；</p>
-</blockquote>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
-<li>工具版本：<br><code>DbVisualizer 9.0.7</code><br>网上有破解的，它还可连接所有主流关系型数据库(我日常就用的它)  </li>
-<li>项目中使用的h2版本：<code>h2-1.4.193</code></li>
+            <h1 id="docker-镜像导入导出"><a href="#docker-镜像导入导出" class="headerlink" title="docker 镜像导入导出"></a>docker 镜像导入导出</h1><p>两组导入导出命令：  </p>
+<ul>
+<li>docker save/load</li>
+<li>docker export/import</li>
 </ul>
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><ul>
-<li>假设<code>mychannel.mv.db</code>文件在<code>/aaa/bbb</code>目录<br>=&gt;  /aaa/bbb/mychannel.mv.db</li>
-<li>打开DbVisualizer向导,创建一个H2连接：<br>Database Type: <code>H2</code><br>Driver(JDBC)： <code>H2 embedded</code><br>Database filename: <code>/aaa/bbb/mychannel</code><br>Database Userid: 项目里面设置的用户名<br>Database Password: 项目里面设置的密码</li>
+<p>两种使用场景(两者可以结合使用)： </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>save/load</td>
+<td>如果部署的节点服务器不能连外部或者内部镜像仓库，则可以docker save镜像打包，然后拷贝上传到要部署的节点服务其上，使用docker load载入</td>
+</tr>
+<tr>
+<td>export/import</td>
+<td>用于制作基础镜像，比如容器启动后，在容器中安装一些软件或者环境的设置，使用docker export导出修改后的容器，然后分发给其他人使用(比如作为基础的开发环境)</td>
+</tr>
+</tbody>
+</table>
+<p>也可以使用docker commit命令，提交修改后的容器，并上传至镜像仓库;<br>注意：用docker commit命令打包的镜像，比Dockerfile方式打出的镜像大(镜像分层问题)</p>
+<h1 id="测试环境准备"><a href="#测试环境准备" class="headerlink" title="测试环境准备"></a>测试环境准备</h1><p>步骤：</p>
+<ul>
+<li>构建一个centos镜像</li>
+<li>进入容器安装软件</li>
+<li>配置防火墙</li>
+<li>提交容器修改</li>
 </ul>
-<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul>
-<li>DbVisualizer 的H2驱动问题<br>DbVisualizer 自己会下载数据库驱动，但自带的h2驱动为 1.3 的版本，目前最新h2版本为 1.4 （因为1.3版本默认是 dbname.h2.db 形式的，用1.3驱动无法正确打开最新的 dbname.mv.db 形式的数据库文件，因为默认后缀不同，连接URL带上数据库名，dbvisualizer 会自动认为是 dbname.h2.db 由于文件不存在，所以变成是新建一个 dbname.h2.db 数据库文件了）  </li>
-<li>解决办法<br>把最新版本的h2的jar包(本地maven仓库中拿)，复制到 DbVisualizer 安装目录下的 DbVisualizer\jdbc\h2 中，把原有目录中的h2.jar 删掉，把最新版本的h2 jar 包命名为 h2.jar 替换原有的。<br>这样就能识别新版本的h2，打开已经创建了的 *.mv.db 了</li>
+<p>构建镜像、运行容器、进入容器后台</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/smalldok/docker-based-tools.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> dind_centos</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker build -t dind_centos .</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --name docker-0 --privileged -d dind_centos</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker <span class="built_in">exec</span> -it -u root docker-0 /bin/bash</span></span><br></pre></td></tr></table></figure>
+<p>安装软件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 安装支持ifconfig命令的工具</span></span><br><span class="line">yum install net-tools</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装firewalld</span></span><br><span class="line">yum install firewalld firewall-config</span><br><span class="line">systemctl start  firewalld # 启动</span><br></pre></td></tr></table></figure>
+<p>开放docker-swarm需要的端口</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 开放防火墙端口</span></span><br><span class="line">firewall-cmd --permanent --add-port=2377/tcp</span><br><span class="line">firewall-cmd --permanent --add-port=7946/tcp</span><br><span class="line">firewall-cmd --permanent --add-port=7946/udp</span><br><span class="line">firewall-cmd --permanent --add-port=4789/udp</span><br><span class="line">firewall-cmd --reload # 永久打开端口需要reload一下</span><br><span class="line">firewall-cmd --list-all # 查看防火墙，添加的端口也可以看到</span><br></pre></td></tr></table></figure>
+<h1 id="docker-export-import"><a href="#docker-export-import" class="headerlink" title="docker export/import"></a>docker export/import</h1><ul>
+<li>docker export<br>docker export是将container的文件系统打包; </li>
+<li>docker import<br>docker import将container导入后成为一个Image,而不是恢复为一个container;<br>可指定image[:tag]，为镜像指定新名称；如果名称相同，则会覆盖老的镜像；</li>
+</ul>
+<p><code>docker export 导出容器</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker ps</span></span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                        NAMES</span><br><span class="line">1eb256b1d4b1        dind_centos         "wrapdocker /usr/sbi…"   About an hour ago   Up About an hour       docker-0</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker <span class="built_in">export</span> 1eb256b1d4b1 &gt; dind_centos.tar</span></span><br></pre></td></tr></table></figure>
+<p><code>docker import 导入</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker import dind_centos.tar dind_centos:1.0</span></span><br><span class="line">sha256:4e8612dad5ba4230e618a424727a679e0f52f7a1fcfb16bbfe5626338784d404</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">dind_centos         1.0                 4e8612dad5ba        20 seconds ago      539MB</span><br><span class="line">dind_centos         latest              9031f35e0ec5        4 days ago          550MB</span><br><span class="line">centos              latest              49f7960eb7e4        3 weeks ago         200MB</span><br></pre></td></tr></table></figure>
+<p><code>查看之前对容器的修改是否还在</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 运行容器</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --name docker-test --privileged -d dind_centos:1.0 wrapdocker /usr/sbin/init</span></span><br><span class="line">960ecfc2f531533ba36c3cefb00fa9f784cdafd14a898577c52262f03d3faede</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看ifconfig是否生效</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ifconfig</span></span><br></pre></td></tr></table></figure>
+<h1 id="docker-save-load"><a href="#docker-save-load" class="headerlink" title="docker save/load"></a>docker save/load</h1><ul>
+<li><p>docker save<br>docker save 可以对image或者container打包；对container打包，其实打的是容器背后的image;<br>docker save 可以用来将一个或者多个Image打包，如： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 打包之后的test.tar包含nginx:1.0 httpd:1.4这两个镜像</span><br><span class="line">docker save -o test.tar nginx:1.0 httpd:1.4</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>docker load  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 该命令会把nginx:1.0 httpd:1.4载入进来，如果本地已经存在这两个镜像，会被覆盖</span><br><span class="line">docker load -i test.tar</span><br></pre></td></tr></table></figure>
+</li>
 </ul>
 
           
@@ -577,7 +618,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -622,7 +663,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -687,7 +728,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -732,7 +775,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

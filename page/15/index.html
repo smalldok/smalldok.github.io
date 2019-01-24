@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/消息类型和消息协议/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/test/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/架构分析/消息类型和消息协议/" class="post-title-link" itemprop="url">消息类型和消息协议</a>
+                <a href="/test/" class="post-title-link" itemprop="url">test</a>
               
             
           </h1>
@@ -458,21 +458,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/" itemprop="url" rel="index"><span itemprop="name">源码学习</span></a></span>
-
-                
-                
-                  ，
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/" itemprop="url" rel="index"><span itemprop="name">MPush</span></a></span>
-
-                
-                
-                  ，
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/架构分析/" itemprop="url" rel="index"><span itemprop="name">架构分析</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/其他/" itemprop="url" rel="index"><span itemprop="name">其他</span></a></span>
 
                 
                 
@@ -487,8 +473,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/架构分析/消息类型和消息协议/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/消息类型和消息协议/" itemprop="commentCount"></span>
+                <a href="/test/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/test/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -496,7 +482,7 @@
 
           
           
-             <span id="/源码学习/MPush/架构分析/消息类型和消息协议/" class="leancloud_visitors" data-flag-title="消息类型和消息协议">
+             <span id="/test/" class="leancloud_visitors" data-flag-title="test">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -529,65 +515,8 @@
       
         
           
-            <h1 id="消息类型"><a href="#消息类型" class="headerlink" title="消息类型"></a>消息类型</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> Command &#123;</span><br><span class="line">    HEARTBEAT(<span class="number">1</span>),          <span class="comment">// 心跳</span></span><br><span class="line">    HANDSHAKE(<span class="number">2</span>),          <span class="comment">// 握手</span></span><br><span class="line">    LOGIN(<span class="number">3</span>),</span><br><span class="line">    LOGOUT(<span class="number">4</span>),</span><br><span class="line">    BIND(<span class="number">5</span>),               <span class="comment">// 绑定用户</span></span><br><span class="line">    UNBIND(<span class="number">6</span>),             <span class="comment">// 解绑用户</span></span><br><span class="line">    FAST_CONNECT(<span class="number">7</span>),       <span class="comment">// 快速重连</span></span><br><span class="line">    PAUSE(<span class="number">8</span>),</span><br><span class="line">    RESUME(<span class="number">9</span>),</span><br><span class="line">    ERROR(<span class="number">10</span>),             <span class="comment">// 错误消息</span></span><br><span class="line">    OK(<span class="number">11</span>),                <span class="comment">// 成功消息</span></span><br><span class="line">    HTTP_PROXY(<span class="number">12</span>),        <span class="comment">// HTTP代理</span></span><br><span class="line">    KICK(<span class="number">13</span>),              <span class="comment">// 踢人</span></span><br><span class="line">    GATEWAY_KICK(<span class="number">14</span>),</span><br><span class="line">    PUSH(<span class="number">15</span>),              <span class="comment">// 推送</span></span><br><span class="line">    GATEWAY_PUSH(<span class="number">16</span>),</span><br><span class="line">    NOTIFICATION(<span class="number">17</span>),</span><br><span class="line">    GATEWAY_NOTIFICATION(<span class="number">18</span>),</span><br><span class="line">    CHAT(<span class="number">19</span>),</span><br><span class="line">    GATEWAY_CHAT(<span class="number">20</span>),</span><br><span class="line">    GROUP(<span class="number">21</span>),</span><br><span class="line">    GATEWAY_GROUP(<span class="number">22</span>),</span><br><span class="line">    ACK(<span class="number">23</span>),</span><br><span class="line">    UNKNOWN(-<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="消息协议"><a href="#消息协议" class="headerlink" title="消息协议"></a>消息协议</h1><ul>
-<li>mpush使用的为自定义私有协议，定长Header + body, 其中header部分固定13个字节。</li>
-<li>心跳固定为一个字节，值为 -33。</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>类型</th>
-<th>长度</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>length</td>
-<td>int</td>
-<td>4</td>
-<td>表示body的长度</td>
-</tr>
-<tr>
-<td>cmd</td>
-<td>byte</td>
-<td>1</td>
-<td>表示消息协议类型</td>
-</tr>
-<tr>
-<td>checkcode</td>
-<td>short</td>
-<td>2</td>
-<td>是根据body生成的一个校验码</td>
-</tr>
-<tr>
-<td>flags</td>
-<td>byte</td>
-<td>1</td>
-<td>表示当前包启用的特性，比如是否启用加密，是否启用压缩</td>
-</tr>
-<tr>
-<td>sessionId</td>
-<td>int</td>
-<td>4</td>
-<td>消息会话标识用于消息响应</td>
-</tr>
-<tr>
-<td>lrc</td>
-<td>byte</td>
-<td>1</td>
-<td>纵向冗余校验，用于校验header</td>
-</tr>
-<tr>
-<td>body</td>
-<td>byte</td>
-<td>不固定</td>
-<td>消息内容</td>
-</tr>
-</tbody>
-</table>
+            <p>test….</p>
+<p> <a href="/download/MPush开发手册.pdf">MPush开发手册</a></p>
 
           
         
@@ -635,7 +564,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -680,7 +609,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -745,7 +674,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -790,7 +721,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

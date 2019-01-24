@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/接入服务/3-用户绑定-解绑 BIND-UNBIND/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/接入服务/6-消息确认 ACK/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/Mpush Server/接入服务/3-用户绑定-解绑 BIND-UNBIND/" class="post-title-link" itemprop="url">3-用户绑定-解绑 BIND-UNBIND</a>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/接入服务/6-消息确认 ACK/" class="post-title-link" itemprop="url">6-消息确认 ACK</a>
               
             
           </h1>
@@ -501,8 +501,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/Mpush Server/接入服务/3-用户绑定-解绑 BIND-UNBIND/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/接入服务/3-用户绑定-解绑 BIND-UNBIND/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/接入服务/6-消息确认 ACK/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/接入服务/6-消息确认 ACK/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -510,7 +510,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/Mpush Server/接入服务/3-用户绑定-解绑 BIND-UNBIND/" class="leancloud_visitors" data-flag-title="3-用户绑定-解绑 BIND-UNBIND">
+             <span id="/源码学习/MPush/源码分析/Mpush Server/接入服务/6-消息确认 ACK/" class="leancloud_visitors" data-flag-title="6-消息确认 ACK">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -543,22 +543,16 @@
       
         
           
-            
-
-	<div class="row">
-    <embed src="3-用户绑定-解绑 BIND-UNBIND.pdf" width="100%" height="550" type="application/pdf">
-	</div>
-
-
-
+            <p>接收到客户端的ACK响应<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ConnectionServer#init()</span></span><br><span class="line">messageDispatcher.register(Command.ACK, () -&gt; <span class="keyword">new</span> AckHandler(mPushServer));</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">AckHandler</span> <span class="keyword">extends</span> <span class="title">BaseMessageHandler</span>&lt;<span class="title">AckMessage</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AckTaskQueue ackTaskQueue;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AckHandler</span><span class="params">(MPushServer mPushServer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.ackTaskQueue = mPushServer.getPushCenter().getAckTaskQueue();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AckMessage <span class="title">decode</span><span class="params">(Packet packet, Connection connection)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> AckMessage(packet, connection);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(AckMessage message)</span> </span>&#123;</span><br><span class="line">        AckTask task = ackTaskQueue.getAndRemove(message.getSessionId());</span><br><span class="line">        <span class="keyword">if</span> (task == <span class="keyword">null</span>) &#123;<span class="comment">//ack 超时了</span></span><br><span class="line">            Logs.PUSH.info(<span class="string">"receive client ack, but task timeout message=&#123;&#125;"</span>, message);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        task.onResponse();<span class="comment">//成功收到客户的ACK响应</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><br><br>接入服务文章目录:</p>
 <ul>
 <li><a href="../1-心跳 HEARTBEAT">1-心跳 HEARTBEAT</a></li>
 <li><a href="../2-握手 HANDSHAKE">2-握手 HANDSHAKE</a></li>
-<li><font color="red">3-用户绑定-解绑 BIND-UNBIND</font></li>
+<li><a href="../3-用户绑定-解绑 BIND-UNBIND">3-用户绑定-解绑 BIND-UNBIND</a></li>
 <li><a href="../4-快速连接 FAST_CONNECT">4-快速连接 FAST_CONNECT</a></li>
 <li><a href="../5-客户端推送 PUSH">5-客户端推送 PUSH</a></li>
-<li><a href="../6-消息确认 ACK">6-消息确认 ACK</a></li>
+<li><font color="red">6-消息确认 ACK</font></li>
 <li><a href="../7-HTTP代理 HTTP_PROXY">7-HTTP代理 HTTP_PROXY</a></li>
 </ul>
 
@@ -608,7 +602,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/76/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/76/">76</a><span class="page-number current">77</span><a class="page-number" href="/page/78/">78</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/78/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/76/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/76/">76</a><span class="page-number current">77</span><a class="page-number" href="/page/78/">78</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/78/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -653,7 +647,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -718,7 +712,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -763,7 +759,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

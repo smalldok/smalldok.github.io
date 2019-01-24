@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/test/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/springboot-webjars集成前端UI/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/test/" class="post-title-link" itemprop="url">test</a>
+                <a href="/springboot-webjars集成前端UI/" class="post-title-link" itemprop="url">springboot-webjars集成前端UI</a>
               
             
           </h1>
@@ -458,7 +458,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/其他/" itemprop="url" rel="index"><span itemprop="name">其他</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a></span>
 
                 
                 
@@ -473,8 +473,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/test/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/test/" itemprop="commentCount"></span>
+                <a href="/springboot-webjars集成前端UI/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/springboot-webjars集成前端UI/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -482,7 +482,7 @@
 
           
           
-             <span id="/test/" class="leancloud_visitors" data-flag-title="test">
+             <span id="/springboot-webjars集成前端UI/" class="leancloud_visitors" data-flag-title="springboot-webjars集成前端UI">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -515,8 +515,34 @@
       
         
           
-            <p>test….</p>
-<p> <a href="/download/MPush开发手册.pdf">MPush开发手册</a></p>
+            <h2 id="什么是WebJars"><a href="#什么是WebJars" class="headerlink" title="什么是WebJars"></a>什么是WebJars</h2><p>WebJars是将客户端（浏览器）资源（JavaScript，Css等）打成jar包文件，以对资源进行统一依赖管理。WebJars的jar包部署在Maven中央仓库上。</p>
+<h2 id="为什么使用"><a href="#为什么使用" class="headerlink" title="为什么使用"></a>为什么使用</h2><p>我们在开发Java web项目的时候会使用像Maven，Gradle等构建工具以实现对jar包版本依赖管理，以及项目的自动化管理，但是对于JavaScript，Css等前端资源包，我们只能采用拷贝到webapp下的方式，这样做就无法对这些资源进行依赖管理。<br>如果我们将这些前端资源打成jar包，我们就可以进行依赖管理。</p>
+<p>我们经常看到类似如下这种带管理后台的第三方工具，在springboot中这么使用：<br><img src="/springboot-webjars集成前端UI/springboot-admin依赖方式.png" alt="springboot-admin">   </p>
+<h2 id="springboot-处理静态资源知识"><a href="#springboot-处理静态资源知识" class="headerlink" title="springboot 处理静态资源知识"></a>springboot 处理静态资源知识</h2><p>Spring Boot 默认将 /** 所有访问映射到以下目录：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">classpath:/META-INF/resources</span><br><span class="line">classpath:/resources</span><br><span class="line">classpath:/<span class="keyword">static</span></span><br><span class="line">classpath:/<span class="keyword">public</span></span><br></pre></td></tr></table></figure></p>
+<p>优先级顺序为：META/resources &gt; resources &gt; static &gt; public  </p>
+<p>如果UI页面不放在这些默认目录，则需要在springboot webconfiguration中配置资源映射(本文就是采用资源映射方式)；  </p>
+<p>参考：<br><a href="http://www.cnblogs.com/magicalSam/p/7189476.html" target="_blank" rel="noopener">http://www.cnblogs.com/magicalSam/p/7189476.html</a><br><a href="https://github.com/codecentric/spring-boot-admin/blob/master/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/config/AdminServerWebConfiguration.java" target="_blank" rel="noopener">https://github.com/codecentric/spring-boot-admin/blob/master/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/config/AdminServerWebConfiguration.java</a></p>
+<h2 id="找个web前端工程"><a href="#找个web前端工程" class="headerlink" title="找个web前端工程"></a>找个web前端工程</h2><ul>
+<li>一个管理后台前端项目<br><a href="http://panjiachen.github.io/vueAdmin-template" target="_blank" rel="noopener">http://panjiachen.github.io/vueAdmin-template</a><br>fork到我自己的github<br><a href="https://github.com/smalldok/vueAdmin-template.git" target="_blank" rel="noopener">https://github.com/smalldok/vueAdmin-template.git</a></li>
+<li>在本地<code>git clone https://github.com/smalldok/vueAdmin-template.git</code></li>
+<li><p>进入vueAdmin-template目录，新建pom.xml文件</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</span><br><span class="line">  &lt;project xmlns=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> xsi:schemaLocation=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span><br><span class="line">    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span><br><span class="line">	&lt;groupId&gt;com.github&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;xxx-admin-server-ui&lt;/artifactId&gt;</span><br><span class="line">	&lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">	&lt;packaging&gt;jar&lt;/packaging&gt; </span><br><span class="line">	</span><br><span class="line">	&lt;properties&gt; </span><br><span class="line">		&lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt; </span><br><span class="line">		&lt;java.version&gt;1.7&lt;/java.version&gt; </span><br><span class="line">	&lt;/properties&gt;</span><br><span class="line">	</span><br><span class="line">    &lt;build&gt;</span><br><span class="line">      &lt;plugins&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">          &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;</span><br><span class="line">          &lt;artifactId&gt;exec-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">          &lt;executions&gt;</span><br><span class="line">            &lt;execution&gt;</span><br><span class="line">              &lt;id&gt;yarn-install&lt;/id&gt;</span><br><span class="line">              &lt;phase&gt;validate&lt;/phase&gt;</span><br><span class="line">              &lt;goals&gt;</span><br><span class="line">                &lt;goal&gt;exec&lt;/goal&gt;</span><br><span class="line">              &lt;/goals&gt;</span><br><span class="line">              &lt;configuration&gt;</span><br><span class="line">                &lt;executable&gt;yarn&lt;/executable&gt;</span><br><span class="line">                &lt;arguments&gt;</span><br><span class="line">                  &lt;argument&gt;install&lt;/argument&gt;</span><br><span class="line">                &lt;/arguments&gt;</span><br><span class="line">              &lt;/configuration&gt;</span><br><span class="line">            &lt;/execution&gt;</span><br><span class="line">            &lt;execution&gt;</span><br><span class="line">              &lt;id&gt;yarn-build&lt;/id&gt;</span><br><span class="line">              &lt;phase&gt;generate-resources&lt;/phase&gt;</span><br><span class="line">              &lt;goals&gt;</span><br><span class="line">                &lt;goal&gt;exec&lt;/goal&gt;</span><br><span class="line">              &lt;/goals&gt;</span><br><span class="line">              &lt;configuration&gt;</span><br><span class="line">                &lt;executable&gt;yarn&lt;/executable&gt;</span><br><span class="line">                &lt;arguments&gt;</span><br><span class="line">                  &lt;argument&gt;run&lt;/argument&gt;</span><br><span class="line">                  &lt;argument&gt;build&lt;/argument&gt;</span><br><span class="line">                &lt;/arguments&gt;</span><br><span class="line">              &lt;/configuration&gt;</span><br><span class="line">            &lt;/execution&gt;</span><br><span class="line">			&lt;!--</span><br><span class="line">            &lt;execution&gt;</span><br><span class="line">              &lt;id&gt;yarn-test&lt;/id&gt;</span><br><span class="line">              &lt;phase&gt;test&lt;/phase&gt;</span><br><span class="line">              &lt;goals&gt;</span><br><span class="line">                &lt;goal&gt;exec&lt;/goal&gt;</span><br><span class="line">              &lt;/goals&gt;</span><br><span class="line">              &lt;configuration&gt;</span><br><span class="line">                &lt;executable&gt;yarn&lt;/executable&gt;</span><br><span class="line">                &lt;arguments&gt;</span><br><span class="line">                  &lt;argument&gt;run&lt;/argument&gt;</span><br><span class="line">                  &lt;argument&gt;test&lt;/argument&gt;</span><br><span class="line">                &lt;/arguments&gt;</span><br><span class="line">              &lt;/configuration&gt;</span><br><span class="line">            &lt;/execution&gt;</span><br><span class="line">			--&gt;</span><br><span class="line">          &lt;/executions&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">          &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">          &lt;artifactId&gt;maven-resources-plugin&lt;/artifactId&gt;</span><br><span class="line">          &lt;configuration&gt;</span><br><span class="line">            &lt;nonFilteredFileExtensions&gt;</span><br><span class="line">              &lt;nonFilteredFileExtension&gt;woff&lt;/nonFilteredFileExtension&gt;</span><br><span class="line">              &lt;nonFilteredFileExtension&gt;ttf&lt;/nonFilteredFileExtension&gt;</span><br><span class="line">              &lt;nonFilteredFileExtension&gt;woff2&lt;/nonFilteredFileExtension&gt;</span><br><span class="line">              &lt;nonFilteredFileExtension&gt;eot&lt;/nonFilteredFileExtension&gt;</span><br><span class="line">              &lt;nonFilteredFileExtension&gt;swf&lt;/nonFilteredFileExtension&gt;</span><br><span class="line">              &lt;nonFilteredFileExtension&gt;ico&lt;/nonFilteredFileExtension&gt;</span><br><span class="line">            &lt;/nonFilteredFileExtensions&gt;</span><br><span class="line">          &lt;/configuration&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">      &lt;/plugins&gt;</span><br><span class="line">      &lt;resources&gt;</span><br><span class="line">        &lt;resource&gt;</span><br><span class="line">          &lt;directory&gt;dist&lt;/directory&gt;</span><br><span class="line">          &lt;targetPath&gt;META-INF/xxx-admin-server-ui&lt;/targetPath&gt;</span><br><span class="line">          &lt;filtering&gt;true&lt;/filtering&gt;</span><br><span class="line">        &lt;/resource&gt;</span><br><span class="line">      &lt;/resources&gt;</span><br><span class="line">    &lt;/build&gt;</span><br><span class="line">  &lt;/project&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装jdk1.8、maven3（略）</p>
+</li>
+<li>安装nodejs（略）</li>
+<li><p>安装yarn<br>1.执行命令<code>npm -i -g yarn</code><br>2.查看当前的源，默认是：官网 ,<code>yarn config get registry</code><br>3.改成taobao的源,<code>yarn config set registry https://registry.npm.taobao.org</code></p>
+</li>
+<li><p>执行<code>mvn  install</code><br>不出意外，会在本地maven仓库中生成<code>xxx-admin-server-ui-1.0.0-SNAPSHOT.jar</code>;<br><img src="/springboot-webjars集成前端UI/xxx-admin-server-ui-xxx.jar.png" alt="xxx-admin-server-ui-xxx.jar">   </p>
+</li>
+<li>以上步骤，最好都在mac下操作</li>
+</ul>
+<h2 id="springboot-集成前端"><a href="#springboot-集成前端" class="headerlink" title="springboot 集成前端"></a>springboot 集成前端</h2><p><code>http://start.spring.io</code>创建一个springboot项目，名字叫xxx-admin-server</p>
+<ul>
+<li>pom.xml配置<br><img src="/springboot-webjars集成前端UI/pom.xml.png" alt="pom.xml"> </li>
+<li>web config<br><img src="/springboot-webjars集成前端UI/webconfig.png" alt="webconfig"> </li>
+<li>启动项目，访问<code>http://127.0.0.1:8080/</code>，最终效果<br><img src="/springboot-webjars集成前端UI/最终效果.png" alt="最终效果"> </li>
+</ul>
 
           
         
@@ -564,7 +590,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -609,7 +635,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -674,7 +700,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -719,7 +747,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

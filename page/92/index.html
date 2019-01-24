@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/SDK/mpush-client-java/1-启动-建立连接/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/控制台服务/admin server测试/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/SDK/mpush-client-java/1-启动-建立连接/" class="post-title-link" itemprop="url">1-启动-建立连接</a>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/控制台服务/admin server测试/" class="post-title-link" itemprop="url">admin server测试</a>
               
             
           </h1>
@@ -479,14 +479,14 @@
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/SDK/" itemprop="url" rel="index"><span itemprop="name">SDK</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/" itemprop="url" rel="index"><span itemprop="name">Mpush Server</span></a></span>
 
                 
                 
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/SDK/mpush-client-java/" itemprop="url" rel="index"><span itemprop="name">mpush-client-java</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/控制台服务/" itemprop="url" rel="index"><span itemprop="name">控制台服务</span></a></span>
 
                 
                 
@@ -501,8 +501,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/SDK/mpush-client-java/1-启动-建立连接/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/SDK/mpush-client-java/1-启动-建立连接/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/控制台服务/admin server测试/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/控制台服务/admin server测试/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -510,7 +510,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/SDK/mpush-client-java/1-启动-建立连接/" class="leancloud_visitors" data-flag-title="1-启动-建立连接">
+             <span id="/源码学习/MPush/源码分析/Mpush Server/控制台服务/admin server测试/" class="leancloud_visitors" data-flag-title="admin server测试">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -543,22 +543,9 @@
       
         
           
-            
-
-	<div class="row">
-    <embed src="1-启动-建立连接.pdf" width="100%" height="550" type="application/pdf">
-	</div>
-
-
-
-<p><br><br> mpush-client-java文章目录:</p>
-<ul>
-<li><a href="../0-关于">0-关于</a></li>
-<li><strong><a href="../1-启动-建立连接">1-启动-建立连接</a></strong></li>
-<li><a href="../2-读数据">2-读数据</a></li>
-<li><a href="../3-写数据">3-写数据</a></li>
-<li><a href="../4-握手">4-握手</a></li>
-</ul>
+            <p>启动mpush服务<br>运行ServerTestMain#testServer()，控制台日志会打印如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">11</span>:<span class="number">47</span>:<span class="number">00.097</span> - [mp-admin-boss-<span class="number">6</span>-<span class="number">1</span>] INFO  - com.mpush.core.server.AdminServer - server start success on:<span class="number">3002</span></span><br></pre></td></tr></table></figure></p>
+<p>telnet连接到mpush admin控制台<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ telnet <span class="number">172.16</span>.177.134 <span class="number">3002</span></span><br><span class="line">Trying <span class="number">172.16</span>.177.134...</span><br><span class="line">Connected to <span class="number">172.16</span>.177.134.</span><br><span class="line">Escape character is <span class="string">'^]'</span>.</span><br><span class="line">Welcome to MPush Console [<span class="number">172.16</span>.177.134]!</span><br><span class="line">since <span class="number">2018</span>-<span class="number">12</span>-<span class="number">26</span>T11:<span class="number">47</span>:<span class="number">00.087</span> has running <span class="number">0</span>(h)</span><br><span class="line"></span><br><span class="line">It is Wed Dec <span class="number">26</span> <span class="number">11</span>:<span class="number">47</span>:<span class="number">29</span> CST <span class="number">2018</span> now.</span><br><span class="line"></span><br><span class="line">help</span><br><span class="line">Option                               Description</span><br><span class="line">------                               -----------</span><br><span class="line">help                                 show help</span><br><span class="line">quit                                 exit console mode</span><br><span class="line">shutdown                             stop mpush server</span><br><span class="line">restart                              restart mpush server</span><br><span class="line">zk:&lt;redis, cs ,gs&gt;                   query zk node</span><br><span class="line">count:&lt;conn, online&gt;                 count conn num or online user count</span><br><span class="line">route:&lt;uid&gt;                          show user route info</span><br><span class="line">push:&lt;uid&gt;, &lt;msg&gt;                    push test msg to client</span><br><span class="line">conf:[key]                           show config info</span><br><span class="line">monitor:[mxBean]                     show system monitor</span><br><span class="line">profile:&lt;<span class="number">1</span>,<span class="number">0</span>&gt;                        enable/disable profile</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">count conn</span><br><span class="line"><span class="number">0</span></span><br><span class="line"></span><br><span class="line">push</span><br><span class="line">unsupported option</span><br><span class="line"></span><br><span class="line">route user01</span><br><span class="line">user [user01] offline now.</span><br><span class="line"></span><br><span class="line">profile <span class="number">1</span></span><br><span class="line">Profiler enabled</span><br><span class="line"></span><br><span class="line">quit</span><br><span class="line">have a good day!</span><br><span class="line"></span><br><span class="line">Connection closed by foreign host.</span><br><span class="line">➜  ~</span><br></pre></td></tr></table></figure></p>
+<p>mpush 后台输出日志：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">12</span>:<span class="number">06</span>:<span class="number">33.915</span> - [mp-admin-work-<span class="number">7</span>-<span class="number">1</span>] INFO  - com.mpush.core.handler.AdminHandler - receive admin command=help</span><br><span class="line"><span class="number">12</span>:<span class="number">06</span>:<span class="number">45.343</span> - [mp-admin-work-<span class="number">7</span>-<span class="number">1</span>] INFO  - com.mpush.core.handler.AdminHandler - receive admin command=count conn</span><br><span class="line"><span class="number">12</span>:<span class="number">07</span>:<span class="number">23.878</span> - [mp-admin-work-<span class="number">7</span>-<span class="number">1</span>] INFO  - com.mpush.core.handler.AdminHandler - receive admin command=push</span><br><span class="line"><span class="number">12</span>:<span class="number">08</span>:<span class="number">14.383</span> - [mp-admin-work-<span class="number">7</span>-<span class="number">1</span>] INFO  - com.mpush.core.handler.AdminHandler - receive admin command=route user01</span><br><span class="line"><span class="number">12</span>:<span class="number">08</span>:<span class="number">35.749</span> - [mp-admin-work-<span class="number">7</span>-<span class="number">1</span>] INFO  - com.mpush.core.handler.AdminHandler - receive admin command=profile <span class="number">1</span></span><br><span class="line"><span class="number">12</span>:<span class="number">10</span>:<span class="number">26.446</span> - [mp-admin-work-<span class="number">7</span>-<span class="number">1</span>] INFO  - com.mpush.core.handler.AdminHandler - receive admin command=quit</span><br></pre></td></tr></table></figure></p>
 
           
         
@@ -606,7 +593,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/91/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/91/">91</a><span class="page-number current">92</span><a class="page-number" href="/page/93/">93</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/93/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/91/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/91/">91</a><span class="page-number current">92</span><a class="page-number" href="/page/93/">93</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/93/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -651,7 +638,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -716,7 +703,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -761,7 +750,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

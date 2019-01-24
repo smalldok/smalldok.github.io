@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/SPI定制化/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/hello-world/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/架构分析/SPI定制化/" class="post-title-link" itemprop="url">SPI定制化</a>
+                <a href="/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
               
             
           </h1>
@@ -447,38 +447,6 @@
           </span>
 
           
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/" itemprop="url" rel="index"><span itemprop="name">源码学习</span></a></span>
-
-                
-                
-                  ，
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/" itemprop="url" rel="index"><span itemprop="name">MPush</span></a></span>
-
-                
-                
-                  ，
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/架构分析/" itemprop="url" rel="index"><span itemprop="name">架构分析</span></a></span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -487,8 +455,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/架构分析/SPI定制化/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/SPI定制化/" itemprop="commentCount"></span>
+                <a href="/hello-world/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/hello-world/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -496,7 +464,7 @@
 
           
           
-             <span id="/源码学习/MPush/架构分析/SPI定制化/" class="leancloud_visitors" data-flag-title="SPI定制化">
+             <span id="/hello-world/" class="leancloud_visitors" data-flag-title="Hello World">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -529,30 +497,16 @@
       
         
           
-            <h1 id="什么是SPI"><a href="#什么是SPI" class="headerlink" title="什么是SPI"></a>什么是SPI</h1><p>建议直接百度 java spi, 官方介绍: <a href="http://docs.oracle.com/javase/tutorial/sound/SPI-intro.html" target="_blank" rel="noopener">http://docs.oracle.com/javase/tutorial/sound/SPI-intro.html</a></p>
-<h1 id="mpush-使用SPI的目的"><a href="#mpush-使用SPI的目的" class="headerlink" title="mpush 使用SPI的目的"></a>mpush 使用SPI的目的</h1><p>肯定是为了扩展性，在不想修改源码的情况下，去替换系统原有的实现，代价最小也最灵活。</p>
-<h1 id="mpush目前支持的SPI列表"><a href="#mpush目前支持的SPI列表" class="headerlink" title="mpush目前支持的SPI列表"></a>mpush目前支持的SPI列表</h1><p>所有受支持的SPI都在mpuhs-api模块的com.mpush.api.spi包下面。  </p>
-<ul>
-<li><code>ServerEventListenerFactory</code> 监听Server 产生的相关事件</li>
-<li><code>BindValidatorFactory</code> 绑定用户身份是校验用户身份是否合法</li>
-<li><code>ClientClassifierFactory</code> 同一个用户多设备登录互踢策略，默认Android和ios会互踢</li>
-<li><code>PushHandlerFactory</code> 接收客户端发送到服务端的上行推送消息</li>
-<li><code>ExecutorFactory</code> 整个系统的线程池工厂，可以按自己的策略创建线程池</li>
-<li><code>CacheManagerFactory</code> 系统使用的缓存实现，默认是redis，支持自定义</li>
-<li><code>MQClientFactory</code> 系统使用的MQ实现，默认是redis的pub/sub，支持自定义</li>
-<li><code>ServiceRegistryFactory</code> 服务注册组件，默认实现是zookeeper，支持自定义</li>
-<li><code>ServiceDiscoveryFactory</code> 服务发现组件，默认实现是zookeeper，支持自定义</li>
-<li><code>PushListenerFactory</code> 消息来源自定义，默认使用Gateway模块，支持自定义，比如使用MQ</li>
-</ul>
-<h1 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h1><ul>
-<li>新建一个maven工程，并加入mpush-api模块的依赖</li>
-<li>实现要定制的接口和其对应的Factory</li>
-<li>在resources目录下创建META-INF.services目录</li>
-<li>创建名字为<code>com.mpush.api.spi.xxx.XXXFactory</code>的文件，即对应的接口名</li>
-<li>文件的内容为实现类的全名(packageName+className)</li>
-<li>通过mvn打成jar包，并把其放到mpush/lib目录</li>
-<li>重启mpush server 就会优先加载用户提供的实现来覆盖原有的默认实现</li>
-</ul>
+            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+<p><img src="/hello-world/test.jpg" alt="test"></p>
 
           
         
@@ -600,7 +554,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -645,7 +599,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -710,7 +664,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -755,7 +711,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

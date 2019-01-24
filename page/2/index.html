@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/docker/docker save-load and export-import/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/设计模式/2-责任链模式Filter/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/docker/docker save-load and export-import/" class="post-title-link" itemprop="url">docker save-load and export-import</a>
+                <a href="/设计模式/2-责任链模式Filter/" class="post-title-link" itemprop="url">2-责任链模式Filter</a>
               
             
           </h1>
@@ -458,7 +458,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/容器/" itemprop="url" rel="index"><span itemprop="name">容器</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/设计模式/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a></span>
 
                 
                 
@@ -473,8 +473,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/docker/docker save-load and export-import/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/docker/docker save-load and export-import/" itemprop="commentCount"></span>
+                <a href="/设计模式/2-责任链模式Filter/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/设计模式/2-责任链模式Filter/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -482,7 +482,7 @@
 
           
           
-             <span id="/docker/docker save-load and export-import/" class="leancloud_visitors" data-flag-title="docker save-load and export-import">
+             <span id="/设计模式/2-责任链模式Filter/" class="leancloud_visitors" data-flag-title="2-责任链模式Filter">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -515,62 +515,37 @@
       
         
           
-            <h1 id="docker-镜像导入导出"><a href="#docker-镜像导入导出" class="headerlink" title="docker 镜像导入导出"></a>docker 镜像导入导出</h1><p>两组导入导出命令：  </p>
+            <h1 id="作用与场景"><a href="#作用与场景" class="headerlink" title="作用与场景"></a>作用与场景</h1><p>过滤或者拦截数据；<br>servlet中的filter、mvc中的拦截器、dubbo中的filter、消费者对重复消息/垃圾消息的过滤等</p>
+<h1 id="责任链模式的几个角色"><a href="#责任链模式的几个角色" class="headerlink" title="责任链模式的几个角色"></a>责任链模式的几个角色</h1><ul>
+<li>入口数据对象inputObj：传入到责任链中流转的数据</li>
+<li>出口数据对象outputObj：责任链处理完之后的对象</li>
+<li>责任链对象xxxxFilter：不同的责任链对象，负责不同的责任</li>
+<li>责任链对象集合FilterChain：存储所有责任链对象，存储数据处理对象</li>
+<li>客户端对象Client：执行具体的责任链</li>
+</ul>
+<h1 id="责任链模式关系图"><a href="#责任链模式关系图" class="headerlink" title="责任链模式关系图"></a>责任链模式关系图</h1><p><img src="/设计模式/2-责任链模式Filter/责任链模式关系图.png" alt="责任链模式关系图"></p>
+<h1 id="举例："><a href="#举例：" class="headerlink" title="举例："></a>举例：</h1><p>MQ消费者对重复消息/垃圾消息的过滤(其实是拦截器)；<br>正常流程：如果消息没被过滤掉，则做保存处理；<br>异常流程：如果碰到的是重复消息或者垃圾消息，则直接跳过后面的Filter，然后做丢弃处理;<br><img src="/设计模式/2-责任链模式Filter/责任链模式-举例.png" alt="责任链模式-举例"></p>
+<h2 id="入口数据对象inputObj"><a href="#入口数据对象inputObj" class="headerlink" title="入口数据对象inputObj"></a>入口数据对象inputObj</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Request</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name = <span class="string">"123"</span>;</span><br><span class="line">        <span class="function">String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="出口数据对象outputObj"><a href="#出口数据对象outputObj" class="headerlink" title="出口数据对象outputObj"></a>出口数据对象outputObj</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Response</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">      <span class="function">String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="责任链对象xxxxFilter"><a href="#责任链对象xxxxFilter" class="headerlink" title="责任链对象xxxxFilter"></a>责任链对象xxxxFilter</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Filter接口</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Filter</span>&lt;<span class="title">Input</span>,<span class="title">Output</span>&gt; </span>&#123;  </span><br><span class="line">    <span class="function">Output <span class="title">doFilter</span><span class="params">(Input input, FilterChain filterChain)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 过滤重复消息</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RepeatFilter</span> <span class="keyword">implements</span> <span class="title">Filter</span>&lt;<span class="title">Request</span>,<span class="title">Response</span>&gt;</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function">Response <span class="title">doFilter</span><span class="params">(Request req, FilterChain filterChain)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//可以附加一些信息</span></span><br><span class="line">        req.setName(req.getName() + <span class="string">"aaa"</span>);</span><br><span class="line">        <span class="comment">//重复消息判定</span></span><br><span class="line">        Boolean isRepeat= xxxService.isRepeat();</span><br><span class="line">        <span class="keyword">if</span>(isRepeat)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> filterChain.doFilter(req);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 过滤垃圾消息</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RubbishFilter</span> <span class="keyword">implements</span> <span class="title">Filter</span>&lt;<span class="title">Request</span>,<span class="title">Response</span>&gt;</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function">Response <span class="title">doFilter</span><span class="params">(Request req, FilterChain filterChain)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//可以附加一些信息</span></span><br><span class="line">        req.setName(req.getName() + <span class="string">"bbb"</span>);</span><br><span class="line">        <span class="comment">//垃圾消息判定</span></span><br><span class="line">        Boolean isRubbish= xxxService.isRubbish();</span><br><span class="line">        <span class="keyword">if</span>(isRubbish)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> filterChain.doFilter(req);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="责任链对象集合FilterChain"><a href="#责任链对象集合FilterChain" class="headerlink" title="责任链对象集合FilterChain"></a>责任链对象集合FilterChain</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FilterChain</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> List&lt;Filter&gt; filters = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">addFilter</span><span class="params">(Filter filter)</span> </span>&#123;</span><br><span class="line">        filters.add(filter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> pos = <span class="number">0</span>;</span><br><span class="line">    <span class="function">Response <span class="title">doFilter</span><span class="params">(Request request)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (pos &lt; filters.size()) &#123;</span><br><span class="line">            Filter filter = filters.get(pos++);</span><br><span class="line">            <span class="keyword">return</span> filter.doFilter(request, <span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="客户端对象Client"><a href="#客户端对象Client" class="headerlink" title="客户端对象Client"></a>客户端对象Client</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">      <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        FilterChain filterChain = <span class="keyword">new</span> FilterChain();</span><br><span class="line">        FilterChain.addFilter(<span class="keyword">new</span> RepeatFilter());</span><br><span class="line">        FilterChain.addFilter(<span class="keyword">new</span> RubbishFilter());</span><br><span class="line">        Response response = filterChain.doFilter(<span class="keyword">new</span> Request());</span><br><span class="line">        <span class="keyword">if</span>(response == <span class="keyword">null</span>)&#123;</span><br><span class="line">            System.out.println(<span class="string">"丢弃消息...."</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">           System.out.println(<span class="string">"保存消息...."</span>);</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="责任链模式总结："><a href="#责任链模式总结：" class="headerlink" title="责任链模式总结："></a>责任链模式总结：</h1><p>优点：  </p>
 <ul>
-<li>docker save/load</li>
-<li>docker export/import</li>
+<li>可以扩展多种过滤业务，方便后续维护；</li>
 </ul>
-<p>两种使用场景(两者可以结合使用)： </p>
-<table>
-<thead>
-<tr>
-<th>命令</th>
-<th>场景</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>save/load</td>
-<td>如果部署的节点服务器不能连外部或者内部镜像仓库，则可以docker save镜像打包，然后拷贝上传到要部署的节点服务其上，使用docker load载入</td>
-</tr>
-<tr>
-<td>export/import</td>
-<td>用于制作基础镜像，比如容器启动后，在容器中安装一些软件或者环境的设置，使用docker export导出修改后的容器，然后分发给其他人使用(比如作为基础的开发环境)</td>
-</tr>
-</tbody>
-</table>
-<p>也可以使用docker commit命令，提交修改后的容器，并上传至镜像仓库;<br>注意：用docker commit命令打包的镜像，比Dockerfile方式打出的镜像大(镜像分层问题)</p>
-<h1 id="测试环境准备"><a href="#测试环境准备" class="headerlink" title="测试环境准备"></a>测试环境准备</h1><p>步骤：</p>
+<p>缺点：  </p>
 <ul>
-<li>构建一个centos镜像</li>
-<li>进入容器安装软件</li>
-<li>配置防火墙</li>
-<li>提交容器修改</li>
+<li>责任链太长或者每条链判断处理的时间太长会影响性能；</li>
+<li>每次都是从链头开始：这也正是链表的缺点。</li>
 </ul>
-<p>构建镜像、运行容器、进入容器后台</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/smalldok/docker-based-tools.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> dind_centos</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker build -t dind_centos .</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --name docker-0 --privileged -d dind_centos</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker <span class="built_in">exec</span> -it -u root docker-0 /bin/bash</span></span><br></pre></td></tr></table></figure>
-<p>安装软件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 安装支持ifconfig命令的工具</span></span><br><span class="line">yum install net-tools</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装firewalld</span></span><br><span class="line">yum install firewalld firewall-config</span><br><span class="line">systemctl start  firewalld # 启动</span><br></pre></td></tr></table></figure>
-<p>开放docker-swarm需要的端口</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 开放防火墙端口</span></span><br><span class="line">firewall-cmd --permanent --add-port=2377/tcp</span><br><span class="line">firewall-cmd --permanent --add-port=7946/tcp</span><br><span class="line">firewall-cmd --permanent --add-port=7946/udp</span><br><span class="line">firewall-cmd --permanent --add-port=4789/udp</span><br><span class="line">firewall-cmd --reload # 永久打开端口需要reload一下</span><br><span class="line">firewall-cmd --list-all # 查看防火墙，添加的端口也可以看到</span><br></pre></td></tr></table></figure>
-<h1 id="docker-export-import"><a href="#docker-export-import" class="headerlink" title="docker export/import"></a>docker export/import</h1><ul>
-<li>docker export<br>docker export是将container的文件系统打包; </li>
-<li>docker import<br>docker import将container导入后成为一个Image,而不是恢复为一个container;<br>可指定image[:tag]，为镜像指定新名称；如果名称相同，则会覆盖老的镜像；</li>
+<p><br><br> 设计模式系列文章:</p>
+<ul>
+<li><a href="../1-命令模式Command">1-命令模式Command</a></li>
+<li><strong><a href="../2-责任链模式Filter">2-责任链模式Filter</a></strong></li>
+<li><a href="../3-策略模式Strategy">3-策略模式Strategy</a></li>
 </ul>
-<p><code>docker export 导出容器</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker ps</span></span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                        NAMES</span><br><span class="line">1eb256b1d4b1        dind_centos         "wrapdocker /usr/sbi…"   About an hour ago   Up About an hour       docker-0</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker <span class="built_in">export</span> 1eb256b1d4b1 &gt; dind_centos.tar</span></span><br></pre></td></tr></table></figure>
-<p><code>docker import 导入</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker import dind_centos.tar dind_centos:1.0</span></span><br><span class="line">sha256:4e8612dad5ba4230e618a424727a679e0f52f7a1fcfb16bbfe5626338784d404</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">dind_centos         1.0                 4e8612dad5ba        20 seconds ago      539MB</span><br><span class="line">dind_centos         latest              9031f35e0ec5        4 days ago          550MB</span><br><span class="line">centos              latest              49f7960eb7e4        3 weeks ago         200MB</span><br></pre></td></tr></table></figure>
-<p><code>查看之前对容器的修改是否还在</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 运行容器</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --name docker-test --privileged -d dind_centos:1.0 wrapdocker /usr/sbin/init</span></span><br><span class="line">960ecfc2f531533ba36c3cefb00fa9f784cdafd14a898577c52262f03d3faede</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看ifconfig是否生效</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ifconfig</span></span><br></pre></td></tr></table></figure>
-<h1 id="docker-save-load"><a href="#docker-save-load" class="headerlink" title="docker save/load"></a>docker save/load</h1><ul>
-<li><p>docker save<br>docker save 可以对image或者container打包；对container打包，其实打的是容器背后的image;<br>docker save 可以用来将一个或者多个Image打包，如： </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 打包之后的test.tar包含nginx:1.0 httpd:1.4这两个镜像</span><br><span class="line">docker save -o test.tar nginx:1.0 httpd:1.4</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>docker load  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 该命令会把nginx:1.0 httpd:1.4载入进来，如果本地已经存在这两个镜像，会被覆盖</span><br><span class="line">docker load -i test.tar</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
+<h2><font style="color:red">写得不好，仅供参考！</font></h2>
 
           
         
@@ -618,7 +593,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -663,7 +638,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -728,7 +703,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -773,7 +750,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

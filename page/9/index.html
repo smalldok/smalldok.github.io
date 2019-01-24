@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/前端开发工具之vscode安装配置/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/spring-retry 破坑/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/前端开发工具之vscode安装配置/" class="post-title-link" itemprop="url">前端开发工具之vscode安装配置</a>
+                <a href="/spring-retry 破坑/" class="post-title-link" itemprop="url">spring-retry 破坑</a>
               
             
           </h1>
@@ -458,7 +458,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端/" itemprop="url" rel="index"><span itemprop="name">前端</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/服务治理/" itemprop="url" rel="index"><span itemprop="name">服务治理</span></a></span>
 
                 
                 
@@ -473,8 +473,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/前端开发工具之vscode安装配置/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/前端开发工具之vscode安装配置/" itemprop="commentCount"></span>
+                <a href="/spring-retry 破坑/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/spring-retry 破坑/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -482,7 +482,7 @@
 
           
           
-             <span id="/前端开发工具之vscode安装配置/" class="leancloud_visitors" data-flag-title="前端开发工具之vscode安装配置">
+             <span id="/spring-retry 破坑/" class="leancloud_visitors" data-flag-title="spring-retry 破坑">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -515,40 +515,22 @@
       
         
           
-            <h2 id="前端的一些开发工具"><a href="#前端的一些开发工具" class="headerlink" title="前端的一些开发工具"></a>前端的一些开发工具</h2><p><code>vscode</code> <code>atom</code> <code>sublime text</code> <code>webstorm</code></p>
-<h2 id="mac-vscode-安装"><a href="#mac-vscode-安装" class="headerlink" title="mac vscode 安装"></a>mac vscode 安装</h2><p>官网下载安装即可，略….<br><code>我安装后的效果</code><br><img src="/前端开发工具之vscode安装配置/vscode.png" alt="vscode">  </p>
-<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><ul>
-<li><p><code>vscode-icon</code><br>项目工程文件加上漂亮图标，方便识别，必备良品！  </p>
-</li>
-<li><p><code>Debugger for Chrome</code><br>映射 chrome 的 debug功能，静态页面都可以用 vscode 来打断点调试</p>
-</li>
-<li><p><code>vscode-fileheader</code><br>添加头部注释：作者、创建时间、最新修改时间;<br>1、设置头注释，打开<code>.vscode/settings.json</code>，查找<code>fileheader</code><br>2、插入头注释快捷键ctrl+alt+i</p>
-</li>
-<li><p><code>beautify</code><br>格式化html，css，js</p>
-</li>
-<li><code>HTML Snippets</code><br>可以在不输入 &lt; 的情况下提示</li>
-<li><code>Git History</code><br>显示git log和line history</li>
-</ul>
-<p>更多插件参考：<br><a href="https://segmentfault.com/a/1190000006697219" target="_blank" rel="noopener">vscode 插件推荐 - 献给所有前端工程师</a></p>
-<p><a href="http://www.cnblogs.com/xwwin/p/6247765.html" target="_blank" rel="noopener">http://www.cnblogs.com/xwwin/p/6247765.html</a></p>
-<h2 id="vscode-配置备份"><a href="#vscode-配置备份" class="headerlink" title="vscode 配置备份"></a>vscode 配置备份</h2><p>这么多配置，不备份怎么行</p>
-<blockquote>
-<p><code>方式一：备份到github gist</code>  </p>
+            <h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p><code>A接口</code> -&gt; <code>B接口</code> 调用失败，重试、重试失败降级处理；<br>如：实现第三方的app Push推送；<br>如：消息系统推送消息给订阅方；</p>
+<h2 id="pom-xml"><a href="#pom-xml" class="headerlink" title="pom.xml"></a>pom.xml</h2><p>项目基于springboot，在根pom.xml中引用，所以这里没有<code>&lt;version&gt;</code>，以springboot中的版本为准;<br>项目根<code>pom.xml</code><br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;parent&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.4.0.RELEASE&lt;/version&gt;</span><br><span class="line">    &lt;relativePath/&gt;</span><br><span class="line">&lt;/parent&gt;</span><br></pre></td></tr></table></figure></p>
+<p>项目mode<code>pom.xml</code><br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- spring-retry --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.retry&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-retry&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.aspectj&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;aspectjweaver&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="spring-retry知识"><a href="#spring-retry知识" class="headerlink" title="spring-retry知识"></a>spring-retry知识</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Retryable</span>(value= &#123;RemoteAccessException.class&#125;,maxAttempts = <span class="number">3</span>,backoff = <span class="meta">@Backoff</span>(delay = <span class="number">1000l</span>,multiplier = <span class="number">1</span>))</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String param)</span></span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Recover</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recover</span><span class="params">(RemoteAccessException e)</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>github 上生成token，然后复制token  </li>
-<li>上传备份<br>vscode中按shift+alt +u  在弹出窗里输入你的token，然后会生成syncSummary.txt文件在窗口中打开；  </li>
-<li>下载备份<br>打开syncSummary.txt文件，找到<code>sync.gist</code>值；<br>vscode中按shift+alt +d，在弹出窗里输入这个值；   </li>
-<li>参考文章：<br><a href="http://www.cnblogs.com/ashidamana/p/6761085.html" target="_blank" rel="noopener">vscode同步设置&amp;扩展插件</a></li>
+<li><code>@Retryable</code><br><code>value</code>选择需要重试的异常，可指定多个；<br><code>maxAttempts</code> 最大重试次数,超过则调用@Recover指定的方法(根据异常类型)<br><code>delay</code> 每次重试的间隔时间</li>
+<li><code>@Recover</code><br>当超过重试次数，则调用此注解的方法(根据异常类型)</li>
 </ul>
-<p><code>方式二：备份github或者git oschina(分支形式)</code>  </p>
-<ul>
-<li>在github或者git oschina创建一个项目<br><a href="https://xxxx/smalldok/mybackup.git" target="_blank" rel="noopener">https://xxxx/smalldok/mybackup.git</a>  </li>
-<li>命令行，进入vscode安装目录  </li>
-<li>备份<br>git init<br>git add .<br>git commit -m “xxxxxxx”<br>git checkout -b mac-vscode1.14.2<br>git remote add origin <a href="https://xxxx/smalldok/mybackup.git" target="_blank" rel="noopener">https://xxxx/smalldok/mybackup.git</a><br>git push origin mac-vscode1.14.2</li>
-<li>恢复<br>git pull –rebase origin mac-vscode1.14.2</li>
-</ul>
-</blockquote>
-<p><strong><code>方式二</code>也是我自己备份电脑上各种配置的做法</strong></p>
+<p><code>使用原则：不要全部异常都进行重试，要有选择性的根据异常重试；</code></p>
+<h2 id="两种使用方式"><a href="#两种使用方式" class="headerlink" title="两种使用方式"></a>两种使用方式</h2><p>我目前使用的第一种方式，因为业务比较简单；</p>
+<h3 id="1、-Retryable和-Recover在同一个类中"><a href="#1、-Retryable和-Recover在同一个类中" class="headerlink" title="1、@Retryable和@Recover在同一个类中"></a>1、@Retryable和@Recover在同一个类中</h3><p><code>@EnableRetry</code>启动配置<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableRetry</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RetryConfig</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>业务类RemoteService.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Retryable</span>(value= &#123;RemoteAccessException.class&#125;,maxAttempts = <span class="number">3</span>,backoff = <span class="meta">@Backoff</span>(delay = <span class="number">1000l</span>,multiplier = <span class="number">1</span>))</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String param)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"do something..."</span>);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RemoteAccessException(<span class="string">"RPC调用异常"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Recover</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recover</span><span class="params">(RemoteAccessException e)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"recover====&gt;"</span>+e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>约束：<br>1、@Retryable 和 @Recover必须在同一个类中<br>2、这个类必须是受spring管理的bean<br>3、方法必须是public</p>
+<h3 id="2、拦截器"><a href="#2、拦截器" class="headerlink" title="2、拦截器"></a>2、拦截器</h3><p><code>@EnableRetry</code>启动配置,且加上<code>拦截器</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnProperty</span>(prefix = <span class="string">"mq.consumer.callback"</span>, name = &#123;<span class="string">"retry-times"</span>,<span class="string">"retry-delay-inMilliseconds"</span>&#125; ,matchIfMissing = <span class="keyword">false</span>)</span><br><span class="line"><span class="meta">@EnableRetry</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RetryConfig</span></span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> ConsumerProperties consumerProperties;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//每一个业务方法对应一个拦截器和自定义recover</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConditionalOnMissingBean</span>(name = <span class="string">"retryInterceptor"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> RetryOperationsInterceptor <span class="title">retryInterceptor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> RetryInterceptorBuilder</span><br><span class="line">                .stateless().recoverer(<span class="keyword">new</span> CustomMessageRecover())</span><br><span class="line">                .backOffOptions(<span class="number">0L</span>,<span class="number">1</span>D, consumerProperties.getCallback().getRetryDelayInMilliseconds())</span><br><span class="line">                .maxAttempts(consumerProperties.getCallback().getRetryTimes()).build();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomMessageRecover</span> <span class="keyword">implements</span> <span class="title">MethodInvocationRecoverer</span>&lt;<span class="title">Void</span>&gt; </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Void <span class="title">recover</span><span class="params">(Object[] args, Throwable cause)</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="string">"IN THE RECOVER ZONE!!!"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>业务类RemoteService.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Retryable</span>(value= &#123;RemoteAccessException.class&#125;,interceptor = <span class="string">"retryInterceptor"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String param)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"do something..."</span>);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RemoteAccessException(<span class="string">"RPC调用异常"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意到没？@Recover注解的方法不在里面了；已经由拦截器代理到CustomMessageRecover类</p>
 
           
         
@@ -596,7 +578,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -641,7 +623,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -706,7 +688,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -751,7 +735,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

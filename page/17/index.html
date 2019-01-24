@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/模块依赖关系/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/架构分析/SPI定制化/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/架构分析/模块依赖关系/" class="post-title-link" itemprop="url">模块依赖关系</a>
+                <a href="/源码学习/MPush/架构分析/SPI定制化/" class="post-title-link" itemprop="url">SPI定制化</a>
               
             
           </h1>
@@ -487,8 +487,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/架构分析/模块依赖关系/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/模块依赖关系/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/架构分析/SPI定制化/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/架构分析/SPI定制化/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -496,7 +496,7 @@
 
           
           
-             <span id="/源码学习/MPush/架构分析/模块依赖关系/" class="leancloud_visitors" data-flag-title="模块依赖关系">
+             <span id="/源码学习/MPush/架构分析/SPI定制化/" class="leancloud_visitors" data-flag-title="SPI定制化">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -529,18 +529,29 @@
       
         
           
-            <p><img src="/源码学习/MPush/架构分析/模块依赖关系/模块依赖关系.png" alt="模块依赖关系">  </p>
+            <h1 id="什么是SPI"><a href="#什么是SPI" class="headerlink" title="什么是SPI"></a>什么是SPI</h1><p>建议直接百度 java spi, 官方介绍: <a href="http://docs.oracle.com/javase/tutorial/sound/SPI-intro.html" target="_blank" rel="noopener">http://docs.oracle.com/javase/tutorial/sound/SPI-intro.html</a></p>
+<h1 id="mpush-使用SPI的目的"><a href="#mpush-使用SPI的目的" class="headerlink" title="mpush 使用SPI的目的"></a>mpush 使用SPI的目的</h1><p>肯定是为了扩展性，在不想修改源码的情况下，去替换系统原有的实现，代价最小也最灵活。</p>
+<h1 id="mpush目前支持的SPI列表"><a href="#mpush目前支持的SPI列表" class="headerlink" title="mpush目前支持的SPI列表"></a>mpush目前支持的SPI列表</h1><p>所有受支持的SPI都在mpuhs-api模块的com.mpush.api.spi包下面。  </p>
 <ul>
-<li>mpush-client：服务端SDK,主要提供发送Push的接口给其他业务使用，比如MPNS</li>
-<li>mpush-boot：是服务端启动入口模块，主要控制server启动、停止流程</li>
-<li>mpush-api：定义了mpush相关核心接口及协议，还包括对外暴露的SPI接口</li>
-<li>mpush-netty：主要提供netty相关的一些基础类，像NettyServer,NettyClient</li>
-<li>mpush-tools：mpush用到的一些工具类，包括线程池，加密，配置文件解析等等</li>
-<li>mpush-zk：zookeeper的client, 包括path的定义，节点定义，数据监听等</li>
-<li>mpush-cache：redis缓存模块，支持单机模式和3.x集群模式，包括用户路由，上下线消息等</li>
-<li>mpush-common：定义了mpush-client模块和mpush-core模块都会用到的类，主要是消息、路由等</li>
-<li>mpush-core：sever核心模块，包括接入服务，网关服务，路由中心，推送中心等等</li>
-<li>mpush-monitor：服务监控模块主要监控JVM，线程池，JMX，服务状态统计，性能统计等</li>
+<li><code>ServerEventListenerFactory</code> 监听Server 产生的相关事件</li>
+<li><code>BindValidatorFactory</code> 绑定用户身份是校验用户身份是否合法</li>
+<li><code>ClientClassifierFactory</code> 同一个用户多设备登录互踢策略，默认Android和ios会互踢</li>
+<li><code>PushHandlerFactory</code> 接收客户端发送到服务端的上行推送消息</li>
+<li><code>ExecutorFactory</code> 整个系统的线程池工厂，可以按自己的策略创建线程池</li>
+<li><code>CacheManagerFactory</code> 系统使用的缓存实现，默认是redis，支持自定义</li>
+<li><code>MQClientFactory</code> 系统使用的MQ实现，默认是redis的pub/sub，支持自定义</li>
+<li><code>ServiceRegistryFactory</code> 服务注册组件，默认实现是zookeeper，支持自定义</li>
+<li><code>ServiceDiscoveryFactory</code> 服务发现组件，默认实现是zookeeper，支持自定义</li>
+<li><code>PushListenerFactory</code> 消息来源自定义，默认使用Gateway模块，支持自定义，比如使用MQ</li>
+</ul>
+<h1 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h1><ul>
+<li>新建一个maven工程，并加入mpush-api模块的依赖</li>
+<li>实现要定制的接口和其对应的Factory</li>
+<li>在resources目录下创建META-INF.services目录</li>
+<li>创建名字为<code>com.mpush.api.spi.xxx.XXXFactory</code>的文件，即对应的接口名</li>
+<li>文件的内容为实现类的全名(packageName+className)</li>
+<li>通过mvn打成jar包，并把其放到mpush/lib目录</li>
+<li>重启mpush server 就会优先加载用户提供的实现来覆盖原有的默认实现</li>
 </ul>
 
           
@@ -589,7 +600,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -634,7 +645,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -699,7 +710,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -744,7 +757,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/websocket接入服务/接收客户端消息/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/SDK/ConnClient(模拟客户端)/2-快速连接消息/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/Mpush Server/websocket接入服务/接收客户端消息/" class="post-title-link" itemprop="url">接收客户端消息</a>
+                <a href="/源码学习/MPush/源码分析/SDK/ConnClient(模拟客户端)/2-快速连接消息/" class="post-title-link" itemprop="url">2-快速连接消息</a>
               
             
           </h1>
@@ -479,14 +479,14 @@
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/" itemprop="url" rel="index"><span itemprop="name">Mpush Server</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/SDK/" itemprop="url" rel="index"><span itemprop="name">SDK</span></a></span>
 
                 
                 
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/websocket接入服务/" itemprop="url" rel="index"><span itemprop="name">websocket接入服务</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/SDK/ConnClient-模拟客户端/" itemprop="url" rel="index"><span itemprop="name">ConnClient(模拟客户端)</span></a></span>
 
                 
                 
@@ -501,8 +501,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/Mpush Server/websocket接入服务/接收客户端消息/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/websocket接入服务/接收客户端消息/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/源码分析/SDK/ConnClient(模拟客户端)/2-快速连接消息/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/SDK/ConnClient(模拟客户端)/2-快速连接消息/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -510,7 +510,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/Mpush Server/websocket接入服务/接收客户端消息/" class="leancloud_visitors" data-flag-title="接收客户端消息">
+             <span id="/源码学习/MPush/源码分析/SDK/ConnClient(模拟客户端)/2-快速连接消息/" class="leancloud_visitors" data-flag-title="2-快速连接消息">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -543,10 +543,26 @@
       
         
           
-            <p>websocket服务，接收客户端的消息种类如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//WebsocketServer#init()</span></span><br><span class="line">messageDispatcher.register(Command.HANDSHAKE, () -&gt; <span class="keyword">new</span> HandshakeHandler(mPushServer));</span><br><span class="line">messageDispatcher.register(Command.BIND, () -&gt; <span class="keyword">new</span> BindUserHandler(mPushServer));</span><br><span class="line">messageDispatcher.register(Command.UNBIND, () -&gt; <span class="keyword">new</span> BindUserHandler(mPushServer));</span><br><span class="line">messageDispatcher.register(Command.PUSH, PushHandlerFactory::create);</span><br><span class="line">messageDispatcher.register(Command.ACK, () -&gt; <span class="keyword">new</span> AckHandler(mPushServer));</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">WebsocketServer</span> <span class="keyword">extends</span> <span class="title">NettyTCPServer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ChannelHandler channelHandler;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> MessageDispatcher messageDispatcher;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ConnectionManager connectionManager;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> MPushServer mPushServer;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WebsocketServer</span><span class="params">(MPushServer mPushServer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(CC.mp.net.ws_server_port);</span><br><span class="line">        <span class="keyword">this</span>.mPushServer = mPushServer;</span><br><span class="line">        <span class="keyword">this</span>.messageDispatcher = <span class="keyword">new</span> MessageDispatcher();</span><br><span class="line">        <span class="keyword">this</span>.connectionManager = <span class="keyword">new</span> ServerConnectionManager(<span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">this</span>.channelHandler = <span class="keyword">new</span> WebSocketChannelHandler(connectionManager, messageDispatcher);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.init();</span><br><span class="line">        connectionManager.init();</span><br><span class="line">        messageDispatcher.register(Command.HANDSHAKE, () -&gt; <span class="keyword">new</span> HandshakeHandler(mPushServer));</span><br><span class="line">        messageDispatcher.register(Command.BIND, () -&gt; <span class="keyword">new</span> BindUserHandler(mPushServer));</span><br><span class="line">        messageDispatcher.register(Command.UNBIND, () -&gt; <span class="keyword">new</span> BindUserHandler(mPushServer));</span><br><span class="line">        messageDispatcher.register(Command.PUSH, PushHandlerFactory::create);</span><br><span class="line">        messageDispatcher.register(Command.ACK, () -&gt; <span class="keyword">new</span> AckHandler(mPushServer));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">(Listener listener)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.stop(listener);</span><br><span class="line">        connectionManager.destroy();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> EventLoopGroup <span class="title">getBossGroup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mPushServer.getConnectionServer().getBossGroup();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> EventLoopGroup <span class="title">getWorkerGroup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mPushServer.getConnectionServer().getWorkerGroup();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initPipeline</span><span class="params">(ChannelPipeline pipeline)</span> </span>&#123;</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> HttpServerCodec());</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> HttpObjectAggregator(<span class="number">65536</span>));</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> WebSocketServerCompressionHandler());</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> WebSocketServerProtocolHandler(CC.mp.net.ws_path, <span class="keyword">null</span>, <span class="keyword">true</span>));</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> WebSocketIndexPageHandler());</span><br><span class="line">        pipeline.addLast(getChannelHandler());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initOptions</span><span class="params">(ServerBootstrap b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.initOptions(b);</span><br><span class="line">        b.option(ChannelOption.SO_BACKLOG, <span class="number">1024</span>);</span><br><span class="line">        b.childOption(ChannelOption.SO_SNDBUF, <span class="number">32</span> * <span class="number">1024</span>);</span><br><span class="line">        b.childOption(ChannelOption.SO_RCVBUF, <span class="number">32</span> * <span class="number">1024</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ChannelHandler <span class="title">getChannelHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> channelHandler;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ConnectionManager <span class="title">getConnectionManager</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> connectionManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> MessageDispatcher <span class="title">getMessageDispatcher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> messageDispatcher;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>WebSocketChannelHandler.java   处理socket消息</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ChannelHandler</span>.Sharable</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebSocketChannelHandler</span> <span class="keyword">extends</span> <span class="title">SimpleChannelInboundHandler</span>&lt;<span class="title">WebSocketFrame</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(WebSocketChannelHandler.class);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ConnectionManager connectionManager;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> PacketReceiver receiver;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WebSocketChannelHandler</span><span class="params">(ConnectionManager connectionManager, PacketReceiver receiver)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.connectionManager = connectionManager;</span><br><span class="line">        <span class="keyword">this</span>.receiver = receiver;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//接收消息</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext ctx, WebSocketFrame frame)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (frame <span class="keyword">instanceof</span> TextWebSocketFrame) &#123;</span><br><span class="line">            String text = ((TextWebSocketFrame) frame).text();</span><br><span class="line">            Connection connection = connectionManager.get(ctx.channel());</span><br><span class="line">            Packet packet = PacketDecoder.decodeFrame(text);</span><br><span class="line">            LOGGER.debug(<span class="string">"channelRead conn=&#123;&#125;, packet=&#123;&#125;"</span>, ctx.channel(), connection.getSessionContext(), packet);</span><br><span class="line">            receiver.onReceive(packet, connection);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            String message = <span class="string">"unsupported frame type: "</span> + frame.getClass().getName();</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException(message);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//连接异常</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Connection connection = connectionManager.get(ctx.channel());</span><br><span class="line">        Logs.CONN.error(<span class="string">"client caught ex, conn=&#123;&#125;"</span>, connection);</span><br><span class="line">        LOGGER.error(<span class="string">"caught an ex, channel=&#123;&#125;, conn=&#123;&#125;"</span>, ctx.channel(), connection, cause);</span><br><span class="line">        ctx.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//建立连接</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Logs.CONN.info(<span class="string">"client connected conn=&#123;&#125;"</span>, ctx.channel());</span><br><span class="line">        Connection connection = <span class="keyword">new</span> NettyConnection();</span><br><span class="line">        connection.init(ctx.channel(), <span class="keyword">false</span>);</span><br><span class="line">        connectionManager.add(connection);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//断开连接</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelInactive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Connection connection = connectionManager.removeAndClose(ctx.channel());</span><br><span class="line">        EventBus.post(<span class="keyword">new</span> ConnectionCloseEvent(connection));</span><br><span class="line">        Logs.CONN.info(<span class="string">"client disconnected conn=&#123;&#125;"</span>, connection);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+            
+
+	<div class="row">
+    <embed src="2-快速连接消息.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+<p><br><br>ConnClient(模拟客户端)文章目录:</p>
+<ul>
+<li><a href="../握手-绑定用户">握手-绑定用户</a></li>
+<li><a href="../1-握手消息">1-握手消息</a></li>
+<li><strong><a href="../2-快速连接消息">2-快速连接消息</a></strong></li>
+<li><a href="../3-踢人消息">3-踢人消息</a></li>
+<li><a href="../4-错误消息">4-错误消息</a></li>
+<li><a href="../5-推送消息">5-推送消息</a></li>
+<li><a href="../6-心跳消息">6-心跳消息</a></li>
+<li><a href="../7-成功消息">7-成功消息</a></li>
+<li><a href="../8-HTTP代理消息">8-HTTP代理消息</a></li>
+</ul>
 
           
         
@@ -594,7 +610,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/52/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/52/">52</a><span class="page-number current">53</span><a class="page-number" href="/page/54/">54</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/54/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/52/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/52/">52</a><span class="page-number current">53</span><a class="page-number" href="/page/54/">54</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/54/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -639,7 +655,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -704,7 +720,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -749,7 +767,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

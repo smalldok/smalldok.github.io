@@ -408,7 +408,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/路由中心/RouterChangeListener路由变更监听/">
+    <link itemprop="mainEntityOfPage" href="https://smalldok.github.io/源码学习/MPush/源码分析/Mpush Server/UDP网关服务/接收MPNS 广播踢人消息/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="smalldok">
@@ -428,7 +428,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/源码学习/MPush/源码分析/Mpush Server/路由中心/RouterChangeListener路由变更监听/" class="post-title-link" itemprop="url">RouterChangeListener路由变更监听</a>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/UDP网关服务/接收MPNS 广播踢人消息/" class="post-title-link" itemprop="url">接收MPNS 广播踢人消息</a>
               
             
           </h1>
@@ -486,7 +486,7 @@
                   ，
                 
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/路由中心/" itemprop="url" rel="index"><span itemprop="name">路由中心</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/源码学习/MPush/源码分析/Mpush-Server/UDP网关服务/" itemprop="url" rel="index"><span itemprop="name">UDP网关服务</span></a></span>
 
                 
                 
@@ -501,8 +501,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/源码学习/MPush/源码分析/Mpush Server/路由中心/RouterChangeListener路由变更监听/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/路由中心/RouterChangeListener路由变更监听/" itemprop="commentCount"></span>
+                <a href="/源码学习/MPush/源码分析/Mpush Server/UDP网关服务/接收MPNS 广播踢人消息/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/源码学习/MPush/源码分析/Mpush Server/UDP网关服务/接收MPNS 广播踢人消息/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -510,7 +510,7 @@
 
           
           
-             <span id="/源码学习/MPush/源码分析/Mpush Server/路由中心/RouterChangeListener路由变更监听/" class="leancloud_visitors" data-flag-title="RouterChangeListener路由变更监听">
+             <span id="/源码学习/MPush/源码分析/Mpush Server/UDP网关服务/接收MPNS 广播踢人消息/" class="leancloud_visitors" data-flag-title="接收MPNS 广播踢人消息">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -543,14 +543,9 @@
       
         
           
-            
-
-	<div class="row">
-    <embed src="RouterChangeListener路由变更监听.pdf" width="100%" height="550" type="application/pdf">
-	</div>
-
-
-
+            <p>GatewayUDPConnector服务，接收MPNS的消息种类如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//GatewayUDPConnector#init()</span></span><br><span class="line"><span class="comment">//PUSH消息</span></span><br><span class="line">messageDispatcher.register(Command.GATEWAY_PUSH, () -&gt; <span class="keyword">new</span> GatewayPushHandler(mPushServer.getPushCenter()));</span><br><span class="line"><span class="comment">//踢人消息</span></span><br><span class="line">messageDispatcher.register(Command.GATEWAY_KICK, () -&gt; <span class="keyword">new</span> GatewayKickUserHandler(mPushServer.getRouterCenter()));</span><br></pre></td></tr></table></figure></p>
+<p>处理踢人消息：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">GatewayKickUserHandler</span> <span class="keyword">extends</span> <span class="title">BaseMessageHandler</span>&lt;<span class="title">GatewayKickUserMessage</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> RouterCenter routerCenter;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GatewayKickUserHandler</span><span class="params">(RouterCenter routerCenter)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.routerCenter = routerCenter;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> GatewayKickUserMessage <span class="title">decode</span><span class="params">(Packet packet, Connection connection)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> GatewayKickUserMessage(packet, connection);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(GatewayKickUserMessage message)</span> </span>&#123;</span><br><span class="line">        routerCenter.getRouterChangeListener().onReceiveKickRemoteMsg(message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>RouterChangeListener.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 处理远程机器发送的踢人广播.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * 一台机器发送广播所有的机器都能收到，</span></span><br><span class="line"><span class="comment"> * 包括发送广播的机器，所有要做一次过滤</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> msg</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceiveKickRemoteMsg</span><span class="params">(KickRemoteMsg msg)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//1.如果当前机器不是目标机器，直接忽略</span></span><br><span class="line">    <span class="keyword">if</span> (!mPushServer.isTargetMachine(msg.getTargetServer(), msg.getTargetPort())) &#123;</span><br><span class="line">        Logs.CONN.error(<span class="string">"receive kick remote msg, target server error, localIp=&#123;&#125;, msg=&#123;&#125;"</span>, ConfigTools.getLocalIp(), msg);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.查询本地路由，找到要被踢下线的链接，并删除该本地路由</span></span><br><span class="line">    String userId = msg.getUserId();</span><br><span class="line">    <span class="keyword">int</span> clientType = msg.getClientType();</span><br><span class="line">    LocalRouterManager localRouterManager = mPushServer.getRouterCenter().getLocalRouterManager();</span><br><span class="line">    LocalRouter localRouter = localRouterManager.lookup(userId, clientType);</span><br><span class="line">    <span class="keyword">if</span> (localRouter != <span class="keyword">null</span>) &#123;</span><br><span class="line">        Logs.CONN.info(<span class="string">"receive kick remote msg, msg=&#123;&#125;"</span>, msg);</span><br><span class="line">        <span class="keyword">if</span> (localRouter.getRouteValue().getId().equals(msg.getConnId())) &#123;<span class="comment">//二次校验，防止误杀</span></span><br><span class="line">            <span class="comment">//fix 0.8.1 踢人的时候不再主动删除路由信息，只发踢人消息到客户端，路由信息有客户端主动解绑的时候再处理。</span></span><br><span class="line">            <span class="comment">//2.1删除本地路由信息</span></span><br><span class="line">            <span class="comment">//localRouterManager.unRegister(userId, clientType);</span></span><br><span class="line">            <span class="comment">//2.2发送踢人消息到客户端</span></span><br><span class="line">            sendKickUserMessage2Client(userId, localRouter);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            Logs.CONN.warn(<span class="string">"kick router failure target connId not match, localRouter=&#123;&#125;, msg=&#123;&#125;"</span>, localRouter, msg);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Logs.CONN.warn(<span class="string">"kick router failure can't find local router, msg=&#123;&#125;"</span>, msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 发送踢人消息到客户端</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId 当前用户</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> router 本地路由信息</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendKickUserMessage2Client</span><span class="params">(<span class="keyword">final</span> String userId, <span class="keyword">final</span> LocalRouter router)</span> </span>&#123;</span><br><span class="line">    Connection connection = router.getRouteValue();</span><br><span class="line">    SessionContext context = connection.getSessionContext();</span><br><span class="line">    KickUserMessage message = KickUserMessage.build(connection);</span><br><span class="line">    message.deviceId = context.deviceId;</span><br><span class="line">    message.userId = userId;</span><br><span class="line">    message.send(future -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (future.isSuccess()) &#123;</span><br><span class="line">            Logs.CONN.info(<span class="string">"kick local connection success, userId=&#123;&#125;, router=&#123;&#125;, conn=&#123;&#125;"</span>, userId, router, connection);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            Logs.CONN.warn(<span class="string">"kick local connection failure, userId=&#123;&#125;, router=&#123;&#125;, conn=&#123;&#125;"</span>, userId, router, connection);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 
           
         
@@ -598,7 +593,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/68/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/68/">68</a><span class="page-number current">69</span><a class="page-number" href="/page/70/">70</a><span class="space">&hellip;</span><a class="page-number" href="/page/97/">97</a><a class="extend next" rel="next" href="/page/70/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/68/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/68/">68</a><span class="page-number current">69</span><a class="page-number" href="/page/70/">70</a><span class="space">&hellip;</span><a class="page-number" href="/page/100/">100</a><a class="extend next" rel="next" href="/page/70/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -643,7 +638,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">100</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -708,7 +703,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">26</span>
+                      
+                    
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -753,7 +750,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">16</span>
+                      
+                    
+                    <span class="site-state-item-count">17</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
